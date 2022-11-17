@@ -1,9 +1,13 @@
 import torch.utils.data
+from torch.utils.data.distributed import DistributedSampler
+from torch.utils.data import DataLoader, Subset
+from torch.nn.parallel.distributed import DistributedDataParallel
 import torchaudio
 import os
 from utils import *
 import random
 from natsort import natsorted
+
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
 
@@ -48,7 +52,7 @@ class DemandDataset(torch.utils.data.Dataset):
         return clean_ds, noisy_ds, length
 
 
-def load_data(ds_dir, batch_size, n_cpu, cut_len):
+def load_data(ds_dir, batch_size, n_cpu, cut_len, rank, world_size):
     torchaudio.set_audio_backend("sox_io")         # in linux
     train_dir = os.path.join(ds_dir, 'train')
     test_dir = os.path.join(ds_dir, 'test')
@@ -56,9 +60,18 @@ def load_data(ds_dir, batch_size, n_cpu, cut_len):
     train_ds = DemandDataset(train_dir, cut_len)
     test_ds = DemandDataset(test_dir, cut_len)
 
-    train_dataset = torch.utils.data.DataLoader(dataset=train_ds, batch_size=batch_size, shuffle=True,
-                                                drop_last=True, num_workers=n_cpu)
-    test_dataset = torch.utils.data.DataLoader(dataset=test_ds, batch_size=batch_size, shuffle=False,
-                                               drop_last=False, num_workers=n_cpu)
+    sampler = DistributedSampler(dataset=train_ds, num_replicas=world_size, rank=rank, shuffle=True)
+    train_dataset = torch.utils.data.DataLoader(dataset=train_ds, 
+                                                batch_size=batch_size, 
+                                                shuffle=False,
+                                                drop_last=True, 
+                                                num_workers=n_cpu,
+                                                sampler=sampler)
+
+    test_dataset = torch.utils.data.DataLoader(dataset=test_ds, 
+                                                batch_size=batch_size, 
+                                                shuffle=False,
+                                                drop_last=False, 
+                                                num_workers=n_cpu)
 
     return train_dataset, test_dataset

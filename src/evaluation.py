@@ -7,6 +7,7 @@ from utils import *
 import torchaudio
 import soundfile as sf
 import argparse
+import time
 
 
 @torch.no_grad()
@@ -25,15 +26,20 @@ def enhance_one_track(model, audio_path, saved_dir, cut_len, n_fft=400, hop=100,
     padded_len = frame_num * 100
     padding_len = padded_len - length
     noisy = torch.cat([noisy, noisy[:, :padding_len]], dim=-1)
+    print("audio path: ", audio_path)
+    print(padded_len, cut_len)
     if padded_len > cut_len:
         batch_size = int(np.ceil(padded_len/cut_len))
+        print("batchsize:", batch_size)
         while 100 % batch_size != 0:
             batch_size += 1
         noisy = torch.reshape(noisy, (batch_size, -1))
 
     noisy_spec = torch.stft(noisy, n_fft, hop, window=torch.hamming_window(n_fft).cuda(), onesided=True)
     noisy_spec = power_compress(noisy_spec).permute(0, 1, 3, 2)
+    time_start = time.time()
     est_real, est_imag = model(noisy_spec)
+    time_end = time.time()
     est_real, est_imag = est_real.permute(0, 1, 3, 2), est_imag.permute(0, 1, 3, 2)
 
     est_spec_uncompress = power_uncompress(est_real, est_imag).squeeze(1)
@@ -46,6 +52,8 @@ def enhance_one_track(model, audio_path, saved_dir, cut_len, n_fft=400, hop=100,
         saved_path = os.path.join(saved_dir, name)
         sf.write(saved_path, est_audio, sr)
 
+    RTF = (time_end - time_start) / (length / sr)
+    print("RTF----: ", RTF, (time_end - time_start), length, sr)
     return est_audio, length
 
 
@@ -65,7 +73,10 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
     for audio in audio_list:
         noisy_path = os.path.join(noisy_dir, audio)
         clean_path = os.path.join(clean_dir, audio)
-        est_audio, length = enhance_one_track(model, noisy_path, saved_dir, 16000*16, n_fft, n_fft//4, save_tracks)
+        try:
+            est_audio, length = enhance_one_track(model, noisy_path, saved_dir, 16000*10, n_fft, n_fft//4, save_tracks)
+        except: 
+            continue
         clean_audio, sr = sf.read(clean_path)
         assert sr == 16000
         metrics = compute_metrics(clean_audio, est_audio, sr, 0)
@@ -78,9 +89,9 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--model_path", type=str, default='./best_ckpt/ckpt_80',
+parser.add_argument("--model_path", type=str, default='/home/minhkhanh/Desktop/work/denoiser/CMGAN/src/best_ckpt/ckpt',
                     help="the path where the model is saved")
-parser.add_argument("--test_dir", type=str, default='dir to your VCTK-DEMAND test dataset',
+parser.add_argument("--test_dir", type=str, default='/home/minhkhanh/Desktop/work/denoiser/dataset/voice_bank_demand/test',
                     help="noisy tracks dir to be enhanced")
 parser.add_argument("--save_tracks", type=str, default=True, help="save predicted tracks or not")
 parser.add_argument("--save_dir", type=str, default='./saved_tracks_best', help="where enhanced tracks to be saved")

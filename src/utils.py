@@ -2,6 +2,16 @@ import torch
 import torch.nn as nn
 
 
+def copy_state(state):
+    return {k: v.cpu().clone() for k, v in state.items()}
+
+
+def serialize_model(model):
+    args, kwargs = model._init_args_kwargs
+    state = copy_state(model.module.state_dict())
+    return {"class": model.__class__, "args": args, "kwargs": kwargs, "state": state}
+
+
 def kaiming_init(m):
     if isinstance(m, nn.Linear):
         torch.nn.init.kaiming_normal_(m.weight)

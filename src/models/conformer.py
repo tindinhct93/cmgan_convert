@@ -98,9 +98,13 @@ class Attention(nn.Module):
         context = default(context, x)
 
         q, k, v = (self.to_q(x), *self.to_kv(context).chunk(2, dim = -1))
+        
+        # with torch.no_grad():
         q, k, v = map(lambda t: rearrange(t, 'b n (h d) -> b h n d', h = h), (q, k, v))
 
         dots = einsum('b h i d, b h j d -> b h i j', q, k) * self.scale
+        # dots = q @ k.transpose(2,3)
+        # dots = dots * self.scale
 
         # shaw's relative positional embedding
         seq = torch.arange(n, device = device)
@@ -108,6 +112,14 @@ class Attention(nn.Module):
         dist = dist.clamp(-max_pos_emb, max_pos_emb) + max_pos_emb
         rel_pos_emb = self.rel_pos_emb(dist).to(q)
         pos_attn = einsum('b h n d, n r d -> b h n r', q, rel_pos_emb) * self.scale
+        
+        # q = q.unsqueeze(3)
+        # rel_pos_emb = rel_pos_emb.unsqueeze(0).unsqueeze(0).transpose(3,4)
+        # # print(q.shape, rel_pos_emb.shape)
+        # pos_attn = torch.matmul(q, rel_pos_emb).squeeze(3)
+        # pos_attn = pos_attn * self.scale
+        # del q, rel_pos_emb
+
         dots = dots + pos_attn
 
         if exists(mask) or exists(context_mask):
@@ -120,6 +132,7 @@ class Attention(nn.Module):
         attn = dots.softmax(dim = -1)
 
         out = einsum('b h i j, b h j d -> b h i d', attn, v)
+        # out = attn @ v
         out = rearrange(out, 'b h n d -> b n (h d)')
         out = self.to_out(out)
         return self.dropout(out)
