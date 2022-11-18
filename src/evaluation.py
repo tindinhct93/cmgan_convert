@@ -8,7 +8,16 @@ import torchaudio
 import soundfile as sf
 import argparse
 import time
+import logging 
 
+logging.basicConfig(filename="train.log",
+                    filemode='a',
+                    format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.DEBUG)
+
+
+logger = logging.getLogger(__name__)
 
 @torch.no_grad()
 def enhance_one_track(model, audio_path, saved_dir, cut_len, n_fft=400, hop=100, save_tracks=False):
@@ -26,11 +35,8 @@ def enhance_one_track(model, audio_path, saved_dir, cut_len, n_fft=400, hop=100,
     padded_len = frame_num * 100
     padding_len = padded_len - length
     noisy = torch.cat([noisy, noisy[:, :padding_len]], dim=-1)
-    print("audio path: ", audio_path)
-    print(padded_len, cut_len)
     if padded_len > cut_len:
         batch_size = int(np.ceil(padded_len/cut_len))
-        print("batchsize:", batch_size)
         while 100 % batch_size != 0:
             batch_size += 1
         noisy = torch.reshape(noisy, (batch_size, -1))
@@ -53,7 +59,6 @@ def enhance_one_track(model, audio_path, saved_dir, cut_len, n_fft=400, hop=100,
         sf.write(saved_path, est_audio, sr)
 
     RTF = (time_end - time_start) / (length / sr)
-    print("RTF----: ", RTF, (time_end - time_start), length, sr)
     return est_audio, length
 
 
@@ -87,19 +92,56 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
     print('pesq: ', metrics_avg[0], 'csig: ', metrics_avg[1], 'cbak: ', metrics_avg[2], 'covl: ',
           metrics_avg[3], 'ssnr: ', metrics_avg[4], 'stoi: ', metrics_avg[5])
 
+def evaluation(model, noisy_dir, clean_dir, save_tracks, saved_dir):
+    n_fft = 400
+    model.eval()
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--model_path", type=str, default='/home/minhkhanh/Desktop/work/denoiser/CMGAN/src/best_ckpt/ckpt',
-                    help="the path where the model is saved")
-parser.add_argument("--test_dir", type=str, default='/home/minhkhanh/Desktop/work/denoiser/dataset/voice_bank_demand/test',
-                    help="noisy tracks dir to be enhanced")
-parser.add_argument("--save_tracks", type=str, default=True, help="save predicted tracks or not")
-parser.add_argument("--save_dir", type=str, default='./saved_tracks_best', help="where enhanced tracks to be saved")
+    if not os.path.exists(saved_dir):
+        os.mkdir(saved_dir)
 
-args = parser.parse_args()
+    audio_list = os.listdir(noisy_dir)
+    audio_list = natsorted(audio_list)
+    num = len(audio_list)
+    metrics_total = np.zeros(6)
+    for audio in audio_list:
+        noisy_path = os.path.join(noisy_dir, audio)
+        clean_path = os.path.join(clean_dir, audio)
+        try:
+            est_audio, length = enhance_one_track(model, noisy_path, saved_dir, 16000*10, n_fft, n_fft//4, save_tracks)
+        except: 
+            continue
+        clean_audio, sr = sf.read(clean_path)
+        assert sr == 16000
+        metrics = compute_metrics(clean_audio, est_audio, sr, 0)
+        metrics = np.array(metrics)
+        metrics_total += metrics
+
+    metrics_avg = metrics_total / num
+    # print('pesq: ', metrics_avg[0], 'csig: ', metrics_avg[1], 'cbak: ', metrics_avg[2], 'covl: ',
+    #       metrics_avg[3], 'ssnr: ', metrics_avg[4], 'stoi: ', metrics_avg[5])
+
+    metrics_avg_dict = {"pesq": metrics_avg[0], 
+                        "csig": metrics_avg[1], 
+                        "cbak": metrics_avg[2], 
+                        "covl": metrics_avg[3], 
+                        "ssnr": metrics_avg[4],
+                        "stoi": metrics_avg[5]}
+    return metrics_avg_dict
+
+
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--model_path", type=str, default='/home/minhkhanh/Desktop/work/denoiser/CMGAN/src/best_ckpt/ckpt',
+                        help="the path where the model is saved")
+    parser.add_argument("--test_dir", type=str, default='/home/minhkhanh/Desktop/work/denoiser/dataset/voice_bank_demand/test',
+                        help="noisy tracks dir to be enhanced")
+    parser.add_argument("--save_tracks", type=str, default=True, help="save predicted tracks or not")
+    parser.add_argument("--save_dir", type=str, default='./saved_tracks_best', help="where enhanced tracks to be saved")
+
+    args = parser.parse_args()
+
     noisy_dir = os.path.join(args.test_dir, 'noisy')
     clean_dir = os.path.join(args.test_dir, 'clean')
     evaluation(args.model_path, noisy_dir, clean_dir, args.save_tracks, args.save_dir)

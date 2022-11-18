@@ -75,3 +75,17 @@ def load_data(ds_dir, batch_size, n_cpu, cut_len, rank, world_size):
                                                 num_workers=n_cpu)
 
     return train_dataset, test_dataset
+
+def load_data(data_dir, batch_size, n_cpu, cut_len, rank, world_size, shuffle):
+    torchaudio.set_audio_backend("sox_io")         # in linux
+    dataset_ds = DemandDataset(data_dir, cut_len)
+
+    sampler = DistributedSampler(dataset=dataset_ds, num_replicas=world_size, rank=rank, shuffle=shuffle)
+    train_dataset = torch.utils.data.DataLoader(dataset=dataset_ds, 
+                                                batch_size=batch_size, 
+                                                shuffle=False,
+                                                drop_last=True, 
+                                                num_workers=n_cpu,
+                                                sampler=sampler)
+
+    return train_dataset
