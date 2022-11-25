@@ -7,7 +7,8 @@ from utils import *
 from typing import Any
 import numpy as np
 import os
-from evaluation import evaluation
+import tqdm
+from evaluation import evaluation_model
 from models import discriminator
 
 
@@ -35,6 +36,7 @@ class Trainer(BaseTrainer):
                 use_amp,
                 interval_eval,
                 max_clip_grad_norm,
+                gradient_accumulation_steps,
                 save_model_dir,
                 data_test_dir,
                 tsb_writer,
@@ -60,6 +62,7 @@ class Trainer(BaseTrainer):
         self.optimizer = optimizer
         self.optimizer_disc = optimizer_disc
         self.batch_size = batch_size
+        self.gradient_accumulation_steps = gradient_accumulation_steps
         
         self.scheduler_D = scheduler_D
         self.scheduler_G = scheduler_G
@@ -91,6 +94,7 @@ class Trainer(BaseTrainer):
         # gather value across devices - https://pytorch.org/docs/stable/distributed.html#torch.distributed.all_gather
         if value.ndim == 0:
             value = value.clone()[None]
+
         output_tensors = [value.clone() for _ in range(self.dist.get_world_size())]
         self.dist.all_gather(output_tensors, value)
         return torch.cat(output_tensors, dim=0)
@@ -112,6 +116,7 @@ class Trainer(BaseTrainer):
         package['best_state'] = self.best_state
         package['loss'] = self.best_loss
         package['epoch'] = epoch
+        package['scaler'] = self.scaler
         tmp_path = os.path.join(self.save_model_dir, "checkpoint.tar")
         torch.save(package, tmp_path)
 
@@ -123,13 +128,15 @@ class Trainer(BaseTrainer):
         torch.save(model, tmp_path)
 
     def _reset(self):
-        self.dist.barrier()
+        # self.dist.barrier()
         if os.path.exists(self.save_model_dir) and os.path.isfile(self.save_model_dir + "/checkpoint.tar"):
             if self.rank == 0:
                 self.logger.info("<<<<<<<<<<<<<<<<<< Load pretrain >>>>>>>>>>>>>>>>>>")
                 self.logger.info("Loading last state for resuming training")
 
-            package = torch.load(self.save_model_dir + "/checkpoint.tar")
+            map_location='cuda:{}'.format(self.rank)
+            map_location = {'cuda:%d' % 0: 'cuda:%d' % self.rank}
+            package = torch.load(self.save_model_dir + "/checkpoint.tar", map_location = map_location)
             
             if isinstance(self.model, torch.nn.parallel.DistributedDataParallel):
                 self.model.module.load_state_dict(package['model'])
@@ -143,6 +150,7 @@ class Trainer(BaseTrainer):
             self.epoch_start = package['epoch'] + 1
             self.best_loss = package['loss']
             self.best_state = package['best_state']
+            self.scaler = package['scaler']
             if self.rank == 0:
                 self.logger.info(f"Model checkpoint loaded. Training will begin at {self.epoch_start} epoch.")
 
@@ -156,7 +164,6 @@ class Trainer(BaseTrainer):
         noisy, clean = torch.transpose(noisy, 0, 1), torch.transpose(clean, 0, 1)
         noisy, clean = torch.transpose(noisy * c, 0, 1), torch.transpose(clean * c, 0, 1)
 
-        self.optimizer.zero_grad()
         noisy_spec = torch.stft(noisy, self.n_fft, self.hop, window=torch.hamming_window(self.n_fft).cuda(),
                                 onesided=True)
         clean_spec = torch.stft(clean, self.n_fft, self.hop, window=torch.hamming_window(self.n_fft).cuda(),
@@ -201,27 +208,21 @@ class Trainer(BaseTrainer):
         assert loss.dtype is torch.float32, f"loss's dtype is not torch.float32 but {loss.dtype}"
 
         self.scaler.scale(loss).backward(retain_graph=True)
-        self.scaler.unscale_(self.optimizer)
-        torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=self.max_clip_grad_norm)
-        self.scaler.step(self.optimizer)
-        self.scaler.update()
 
         est_audio_list = list(est_audio.detach().cpu().numpy())
         clean_audio_list = list(clean.cpu().numpy()[:, :length])
-        pesq_score = discriminator.batch_pesq(clean_audio_list, est_audio_list)
+        pesq_score = discriminator.batch_pesq(clean_audio_list, est_audio_list, self.n_gpus)
 
         # The calculation of PESQ can be None due to silent part
         if pesq_score is not None:
-            self.optimizer_disc.zero_grad()
             predict_enhance_metric = self.model_discriminator(clean_mag, est_mag.detach())
             (clean_mag, est_mag.detach())
             predict_max_metric = self.model_discriminator(clean_mag, clean_mag)
             discrim_loss_metric = F.mse_loss(predict_max_metric.flatten(), one_labels) + \
                                   F.mse_loss(predict_enhance_metric.flatten(), pesq_score)
             discrim_loss_metric.backward()
-            self.optimizer_disc.step()
         else:
-            discrim_loss_metric = torch.tensor([0.])
+            discrim_loss_metric = torch.tensor([0.], requires_grad=True).cuda()
 
         # Logging
         # average over devices in ddp
@@ -234,57 +235,77 @@ class Trainer(BaseTrainer):
 
     def _train_epoch(self, epoch) -> None:
         gen_loss_train, disc_loss_train = [], []
-        start_time = time.time()
-        name = f"Train | Epoch {epoch + 1}"
+
+        self.logger.info('\n <Epoch>: {} -- Start training '.format(epoch))
+        name = f"Train | Epoch {epoch}"
         logprog = LogProgress(self.logger, self.train_ds, updates=self.num_prints, name=name)
 
         for idx, batch in enumerate(logprog):
             loss, disc_loss = self._train_step(batch)
             gen_loss_train.append(loss )
             disc_loss_train.append(disc_loss)
+            if self.rank  == 0:
+                logprog.update(gen_loss=format(loss, ".5f"), disc_loss=format(disc_loss, ".5f"))
+            
+            # Optimize step
+            if (idx + 1) % self.gradient_accumulation_steps == 0 or idx == len(self.train_ds) - 1:
+                
+                #gradient clipping
+                self.scaler.unscale_(self.optimizer)
+                torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=self.max_clip_grad_norm)
+                self.scaler.step(self.optimizer)
+                self.optimizer.zero_grad()
 
-            logprog.update(gen_loss=format(loss, ".5f"), disc_loss=format(disc_loss, ".5f"))
+                self.scaler.update()
+
+                self.optimizer_disc.step()
+                self.optimizer_disc.zero_grad()
+                
 
         gen_loss_train = np.mean(gen_loss_train)
         disc_loss_train = np.mean(disc_loss_train)
 
         template = 'Generator loss: {}, Discriminator loss: {}'
         info = template.format(gen_loss_train, disc_loss_train)
-        self.logger.info('-' * 70)
-        self.logger.info(bold(f"     Epoch {epoch + 1} - Overall Summary Training | {info}"))
-
-        self.tsb_writer.add_scalar("Loss_gen/train", gen_loss_train, epoch)
-        self.tsb_writer.add_scalar("Loss_disc/train", disc_loss_train, epoch)
+        if self.rank == 0:
+            # print("Done epoch {} - {}".format(epoch, info))
+            self.logger.info('-' * 70)
+            self.logger.info(bold(f"     Epoch {epoch} - Overall Summary Training | {info}"))
+            self.tsb_writer.add_scalar("Loss_gen/train", gen_loss_train, epoch)
+            self.tsb_writer.add_scalar("Loss_disc/train", disc_loss_train, epoch)
 
         gen_loss_valid, disc_loss_valid = self._valid_epoch(epoch)
 
-        info = template.format(gen_loss_train, disc_loss_train)
-        self.logger.info(bold(f"             - Overall Summary Validation | {info}"))
-        self.logger.info('-' * 70)
+         # save best checkpoint
+        if self.rank == 0:
+            info = template.format(gen_loss_valid, disc_loss_valid)
+            self.logger.info(bold(f"             - Overall Summary Validation | {info}"))
+            self.logger.info('-' * 70)
 
-        self.tsb_writer.add_scalar("Loss_gen/valid", gen_loss_valid, epoch)
-        self.tsb_writer.add_scalar("Loss_disc/valid", disc_loss_valid, epoch)
+            self.tsb_writer.add_scalar("Loss_gen/valid", gen_loss_valid, epoch)
+            self.tsb_writer.add_scalar("Loss_disc/valid", disc_loss_valid, epoch)
 
-        # save best checkpoint
-        self.best_loss = min(self.best_loss, gen_loss_valid)
-        if gen_loss_valid == self.best_loss:
-            self.best_state = copy_state(self.model.state_dict())
+            self.best_loss = min(self.best_loss, gen_loss_valid)
+            if gen_loss_valid == self.best_loss:
+                self.best_state = copy_state(self.model.state_dict())
 
-        self._serialize(epoch)
+            self._serialize(epoch)
 
-        if epoch % self.interval_eval == 0:
-            metrics_avg = evaluation(self.model, 
-                            self.data_test_dir + "/noisy", 
-                            self.data_test_dir + "/clean",
-                            True, 
-                            self.save_enhanced_dir)
+            if epoch % self.interval_eval == 0:
+                metrics_avg = evaluation_model(self.model, 
+                                self.data_test_dir + "/noisy", 
+                                self.data_test_dir + "/clean",
+                                True, 
+                                self.save_enhanced_dir)
 
-            for metric_type, value in metrics_avg.items():
-                self.tsb_writer.add_scalar(f"metric/{metric_type}", value, epoch)
+                for metric_type, value in metrics_avg.items():
+                    self.tsb_writer.add_scalar(f"metric/{metric_type}", value, epoch)
 
-            info = " | ".join(f"{k.capitalize()} {v:.5f}" for k, v in metrics_avg.items())
-            self.logger.info(bold(f"     Evaluation Summary:  | Epoch {epoch + 1} | {info}"))
+                info = " | ".join(f"{k.capitalize()} {v:.5f}" for k, v in metrics_avg.items())
+                # print("Evaluation epoch {} -- {}".format(epoch, info))
+                self.logger.info(bold(f"     Evaluation Summary:  | Epoch {epoch + 1} | {info}"))
 
+        self.dist.barrier() # see https://stackoverflow.com/questions/59760328/how-does-torch-distributed-barrier-work
         self.scheduler_G.step()
         self.scheduler_D.step()
 
@@ -335,7 +356,7 @@ class Trainer(BaseTrainer):
         est_audio_list = list(est_audio.detach().cpu().numpy())
         clean_audio_list = list(clean.cpu().numpy()[:, :length])
 
-        pesq_score = discriminator.batch_pesq(clean_audio_list, est_audio_list)
+        pesq_score = discriminator.batch_pesq(clean_audio_list, est_audio_list, self.n_gpus)
 
         if pesq_score is not None:
             predict_enhance_metric = self.model_discriminator(clean_mag, est_mag.detach())
@@ -343,7 +364,7 @@ class Trainer(BaseTrainer):
             discrim_loss_metric = F.mse_loss(predict_max_metric.flatten(), one_labels) + \
                                   F.mse_loss(predict_enhance_metric.flatten(), pesq_score)
         else:
-            discrim_loss_metric = torch.tensor([0.])
+            discrim_loss_metric = torch.tensor([0.], requires_grad=True).cuda()
         
         # Logging
         # average over devices in ddp

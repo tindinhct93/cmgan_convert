@@ -64,8 +64,16 @@ def enhance_one_track(model, audio_path, saved_dir, cut_len, n_fft=400, hop=100,
 
 def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
     n_fft = 400
+  
+    state_dict = torch.load(model_path)
+    # from collections import OrderedDict
+    # new_state_dict = OrderedDict()
+    # for k, v in state_dict.items():
+        # name = k[7:] # remove 'module.' of DataParallel/DistributedDataParallel
+    #     new_state_dict[name] = v
+
     model = generator.TSCNet(num_channel=64, num_features=n_fft//2+1).cuda()
-    model.load_state_dict((torch.load(model_path)))
+    model.load_state_dict(state_dict)
     model.eval()
 
     if not os.path.exists(saved_dir):
@@ -86,13 +94,14 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
         assert sr == 16000
         metrics = compute_metrics(clean_audio, est_audio, sr, 0)
         metrics = np.array(metrics)
+        print("audio - {} - metric {}".format(audio, metrics))
         metrics_total += metrics
 
     metrics_avg = metrics_total / num
     print('pesq: ', metrics_avg[0], 'csig: ', metrics_avg[1], 'cbak: ', metrics_avg[2], 'covl: ',
           metrics_avg[3], 'ssnr: ', metrics_avg[4], 'stoi: ', metrics_avg[5])
 
-def evaluation(model, noisy_dir, clean_dir, save_tracks, saved_dir):
+def evaluation_model(model, noisy_dir, clean_dir, save_tracks, saved_dir):
     n_fft = 400
     model.eval()
 
@@ -144,4 +153,5 @@ if __name__ == '__main__':
 
     noisy_dir = os.path.join(args.test_dir, 'noisy')
     clean_dir = os.path.join(args.test_dir, 'clean')
+    load_from_checkpoint = True
     evaluation(args.model_path, noisy_dir, clean_dir, args.save_tracks, args.save_dir)

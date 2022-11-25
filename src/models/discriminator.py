@@ -13,11 +13,15 @@ def pesq_loss(clean, noisy, sr=16000):
     return pesq_score
 
 
-def batch_pesq(clean, noisy):
-    pesq_score = Parallel(n_jobs=-1)(delayed(pesq_loss)(c, n) for c, n in zip(clean, noisy))
+def batch_pesq(clean, noisy, n_jobs):
+    pesq_score = Parallel(n_jobs=n_jobs)(delayed(pesq_loss)(c, n) for c, n in zip(clean, noisy))
     pesq_score = np.array(pesq_score)
     if -1 in pesq_score:
-        return None
+        print("PESQ: ", pesq_score)
+        tmp = pesq_score[pesq_score!=-1]
+        tmp = np.mean(tmp)
+        pesq_score = np.where(pesq_score==-1, tmp, pesq_score)
+        
     pesq_score = (pesq_score - 1) / 3.5
     return torch.FloatTensor(pesq_score).to('cuda')
 
