@@ -52,7 +52,9 @@ def entry(rank, world_size, config):
     gamma = config["scheduler"]["gamma"]
     decay_epoch = config['scheduler']['decay_epoch']
     num_channel = config['model']['num_channel']
-    
+    # augment
+    remix = config["main"]["augment"]["remix"]
+
 
     # feature
     n_fft = config["feature"]["n_fft"]
@@ -108,11 +110,11 @@ def entry(rank, world_size, config):
     model_discriminator = discriminator.Discriminator(ndf=ndf)
     model_discriminator = DistributedDataParallel(model_discriminator.to(rank), device_ids=[rank])
 
+
     if rank == 0:
-        summary(model, [(4, 2, cut_len//hop+1, int(n_fft/2)+1)])
+        summary(model, [(2, 2, cut_len//hop+1, int(n_fft/2)+1)])
         summary(model_discriminator, [(1, 1, int(n_fft/2)+1, cut_len//hop+1),
                                     (1, 1, int(n_fft/2)+1, cut_len//hop+1)])
-
 
     # optimizer
     optimizer = torch.optim.AdamW(model.parameters(), lr=init_lr)
@@ -132,7 +134,9 @@ def entry(rank, world_size, config):
     loss_weights.append(config["main"]['loss_weights']["gan"])
 
     trainer_class = initialize_module(config["trainer"]["path"], initialize=False)
+
     trainer = trainer_class(
+        only_eval = only_eval,
         dist = dist,
         rank = rank,
         resume = resume,
@@ -158,6 +162,8 @@ def entry(rank, world_size, config):
         interval_eval = interval_eval,
         max_clip_grad_norm = max_clip_grad_norm,
         gradient_accumulation_steps = gradient_accumulation_steps,
+
+        remix = remix,
         
         save_model_dir = save_model_dir,
         data_test_dir = data_test_dir,
@@ -180,6 +186,7 @@ if __name__ == '__main__':
                                         help="config file path (defaul: None)", 
                                         default="/home/minhkhanh/Desktop/work/denoiser/CMGAN/src/config.toml")
 
+
     args = parser.parse_args()
     config = toml.load(args.config)
 
@@ -189,8 +196,16 @@ if __name__ == '__main__':
     print("GPU list:", available_gpus)
     args.n_gpus = len(available_gpus)
     print("Number of gpu:", args.n_gpus)
+
+    try: 
+        mp.spawn(entry,
+                args=(args.n_gpus, config),
+                nprocs=args.n_gpus,
+                join=True)
+    except KeyboardInterrupt:
+        print('Interrupted')
+        try: 
+            dist.destroy_process_group()  
+        except KeyboardInterrupt: 
+            os.system("kill $(ps aux | grep multiprocessing.spawn | grep -v grep | awk '{print $2}') ")
     
-    mp.spawn(entry,
-             args=(args.n_gpus, config),
-             nprocs=args.n_gpus,
-             join=True)

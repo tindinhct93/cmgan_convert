@@ -3,6 +3,7 @@ from models import generator
 from natsort import natsorted
 import os
 from tools.compute_metrics import compute_metrics
+from joblib import Parallel, delayed
 from utils import *
 import torchaudio
 import soundfile as sf
@@ -66,14 +67,14 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
     n_fft = 400
   
     state_dict = torch.load(model_path)
-    # from collections import OrderedDict
-    # new_state_dict = OrderedDict()
-    # for k, v in state_dict.items():
-        # name = k[7:] # remove 'module.' of DataParallel/DistributedDataParallel
-    #     new_state_dict[name] = v
+    from collections import OrderedDict
+    new_state_dict = OrderedDict()
+    for k, v in state_dict.items():
+        name = k[7:] # remove 'module.' of DataParallel/DistributedDataParallel
+        new_state_dict[name] = v
 
     model = generator.TSCNet(num_channel=64, num_features=n_fft//2+1).cuda()
-    model.load_state_dict(state_dict)
+    model.load_state_dict(new_state_dict)
     model.eval()
 
     if not os.path.exists(saved_dir):
@@ -83,21 +84,44 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
     audio_list = natsorted(audio_list)
     num = len(audio_list)
     metrics_total = np.zeros(6)
-    for audio in audio_list:
-        noisy_path = os.path.join(noisy_dir, audio)
-        clean_path = os.path.join(clean_dir, audio)
-        try:
-            est_audio, length = enhance_one_track(model, noisy_path, saved_dir, 16000*10, n_fft, n_fft//4, save_tracks)
-        except: 
-            continue
-        clean_audio, sr = sf.read(clean_path)
-        assert sr == 16000
-        metrics = compute_metrics(clean_audio, est_audio, sr, 0)
-        metrics = np.array(metrics)
-        print("audio - {} - metric {}".format(audio, metrics))
-        metrics_total += metrics
+    # for audio in audio_list:
+    #     noisy_path = os.path.join(noisy_dir, audio)
+    #     clean_path = os.path.join(clean_dir, audio)
+    #     try:
+    #         est_audio, length = enhance_one_track(model, noisy_path, saved_dir, 16000*10, n_fft, n_fft//4, save_tracks)
+    #     except: 
+    #         continue
+    #     clean_audio, sr = sf.read(clean_path)
+    #     assert sr == 16000
+    #     metrics = compute_metrics(clean_audio, est_audio, sr, 0)
+    #     metrics = np.array(metrics)
+    #     print("audio - {} - metric {}".format(audio, metrics))
+    #     metrics_total += metrics
 
-    metrics_avg = metrics_total / num
+    # metrics_avg = metrics_total / num
+
+    ls_est_audio = Parallel(n_jobs=1)(
+                delayed(enhance_one_track)(model, 
+                                            os.path.join(noisy_dir, audio),
+                                            saved_dir,
+                                            16000*10, 
+                                            n_fft, 
+                                            n_fft//4, 
+                                            save_tracks
+                                            ) for audio in audio_list)
+    print(audio_list[:10])
+    print(ls_est_audio[0][0])
+    
+    sr = 16000
+    metrics = Parallel(n_jobs=1)(
+        delayed(compute_metrics)(sf.read(os.path.join(clean_dir, audio_list[i]))[0],
+                                ls_est_audio[i][0],
+                                sr,
+                                0) for i in range(len(ls_est_audio))
+    )
+
+    metrics_avg = np.mean(metrics)
+
     print('pesq: ', metrics_avg[0], 'csig: ', metrics_avg[1], 'cbak: ', metrics_avg[2], 'covl: ',
           metrics_avg[3], 'ssnr: ', metrics_avg[4], 'stoi: ', metrics_avg[5])
 
@@ -112,20 +136,37 @@ def evaluation_model(model, noisy_dir, clean_dir, save_tracks, saved_dir):
     audio_list = natsorted(audio_list)
     num = len(audio_list)
     metrics_total = np.zeros(6)
-    for audio in audio_list:
-        noisy_path = os.path.join(noisy_dir, audio)
-        clean_path = os.path.join(clean_dir, audio)
-        try:
-            est_audio, length = enhance_one_track(model, noisy_path, saved_dir, 16000*10, n_fft, n_fft//4, save_tracks)
-        except: 
-            continue
-        clean_audio, sr = sf.read(clean_path)
-        assert sr == 16000
-        metrics = compute_metrics(clean_audio, est_audio, sr, 0)
-        metrics = np.array(metrics)
-        metrics_total += metrics
+    # for audio in audio_list:
+    #     noisy_path = os.path.join(noisy_dir, audio)
+    #     clean_path = os.path.join(clean_dir, audio)
+    #     try:
+    #         est_audio, length = enhance_one_track(model, noisy_path, saved_dir, 16000*10, n_fft, n_fft//4, save_tracks)
+    #     except: 
+    #         continue
+    #     clean_audio, sr = sf.read(clean_path)
+    #     assert sr == 16000
+    #     metrics = compute_metrics(clean_audio, est_audio, sr, 0)
+    #     metrics = np.array(metrics)
+    #     metrics_total += metrics
 
-    metrics_avg = metrics_total / num
+    ls_est_audio, ls_length = Parallel(n_jobs=8)(
+                delayed(enhance_one_track)(model, 
+                                            os.path.join(noisy_dir, audio),
+                                            os.path.join(clean_dir, audio),
+                                            16000*10, 
+                                            n_fft, 
+                                            n_fft//4, 
+                                            save_tracks
+                                            ) for audio in audio_list)
+    print(audio_list[:10])
+    print(ls_est_audio[:10])
+    
+    metrics = Parallel(n_jobs=8)(
+        delayed(compute_metrics)(os.path.join(clean_dir,audio_list[i]),
+                                est_audio) for i in range(ls_est_audio)
+    )
+
+    metrics_avg = np.mean(metrics)
     # print('pesq: ', metrics_avg[0], 'csig: ', metrics_avg[1], 'cbak: ', metrics_avg[2], 'covl: ',
     #       metrics_avg[3], 'ssnr: ', metrics_avg[4], 'stoi: ', metrics_avg[5])
 
@@ -137,6 +178,12 @@ def evaluation_model(model, noisy_dir, clean_dir, save_tracks, saved_dir):
                         "stoi": metrics_avg[5]}
     return metrics_avg_dict
 
+def eval_best_loss(checkpoint_path):
+    package = torch.load(checkpoint_path, map_location = "cpu")
+ 
+    best_loss = package['loss']
+    epochs = package['epoch']
+    print(f"Best loss in {best_loss} epochs: {epochs}")
 
 
 
@@ -149,9 +196,17 @@ if __name__ == '__main__':
     parser.add_argument("--save_tracks", type=str, default=True, help="save predicted tracks or not")
     parser.add_argument("--save_dir", type=str, default='./saved_tracks_best', help="where enhanced tracks to be saved")
 
+    parser.add_argument("-e", "--eval", required=False, 
+                                        type=str, 
+                                        help="Path to checkpoint dir", 
+                                        default="")
+
     args = parser.parse_args()
 
-    noisy_dir = os.path.join(args.test_dir, 'noisy')
-    clean_dir = os.path.join(args.test_dir, 'clean')
-    load_from_checkpoint = True
-    evaluation(args.model_path, noisy_dir, clean_dir, args.save_tracks, args.save_dir)
+    if args.eval:
+        eval_best_loss(args.eval)
+    else:
+        noisy_dir = os.path.join(args.test_dir, 'noisy')
+        clean_dir = os.path.join(args.test_dir, 'clean')
+        load_from_checkpoint = True
+        evaluation(args.model_path, noisy_dir, clean_dir, args.save_tracks, args.save_dir)

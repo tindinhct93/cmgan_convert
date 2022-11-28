@@ -9,6 +9,7 @@ import numpy as np
 import os
 import tqdm
 from evaluation import evaluation_model
+from augment import Remix
 from models import discriminator
 
 
@@ -37,6 +38,7 @@ class Trainer(BaseTrainer):
                 interval_eval,
                 max_clip_grad_norm,
                 gradient_accumulation_steps,
+                remix,
                 save_model_dir,
                 data_test_dir,
                 tsb_writer,
@@ -83,6 +85,12 @@ class Trainer(BaseTrainer):
         self.num_prints = num_prints
         self.logger = logger
         
+        # data augment
+        augments = []
+        if remix:
+            augments.append(Remix())
+        self.augment = torch.nn.Sequential(*augments)
+
         if not os.path.exists(self.save_enhanced_dir):
             os.makedirs(self.save_enhanced_dir)
 
@@ -153,6 +161,9 @@ class Trainer(BaseTrainer):
             self.scaler = package['scaler']
             if self.rank == 0:
                 self.logger.info(f"Model checkpoint loaded. Training will begin at {self.epoch_start} epoch.")
+                self.logger.info(f"Load pretrained info: ")
+                self.logger.info(f"Best loss: {self.best_loss}")
+
 
     def _train_step(self, batch):
         clean = batch[0].cuda()
@@ -163,6 +174,12 @@ class Trainer(BaseTrainer):
         c = torch.sqrt(noisy.size(-1) / torch.sum((noisy ** 2.0), dim=-1))
         noisy, clean = torch.transpose(noisy, 0, 1), torch.transpose(clean, 0, 1)
         noisy, clean = torch.transpose(noisy * c, 0, 1), torch.transpose(clean * c, 0, 1)
+
+        if len(self.augment) > 0:
+            sources = torch.stack([noisy - clean, clean])
+            sources = self.augment(sources)
+            noise, clean = sources
+            noisy = noise + clean
 
         noisy_spec = torch.stft(noisy, self.n_fft, self.hop, window=torch.hamming_window(self.n_fft).cuda(),
                                 onesided=True)
