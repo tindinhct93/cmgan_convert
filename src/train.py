@@ -136,7 +136,6 @@ def entry(rank, world_size, config):
     trainer_class = initialize_module(config["trainer"]["path"], initialize=False)
 
     trainer = trainer_class(
-        only_eval = only_eval,
         dist = dist,
         rank = rank,
         resume = resume,
