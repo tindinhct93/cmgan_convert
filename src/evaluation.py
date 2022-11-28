@@ -145,6 +145,7 @@ def evaluation_model(model, noisy_dir, clean_dir, save_tracks, saved_dir):
                         "covl": metrics_avg[3], 
                         "ssnr": metrics_avg[4],
                         "stoi": metrics_avg[5]}
+    
     return metrics_avg_dict
 
 def eval_best_loss(checkpoint_path):
