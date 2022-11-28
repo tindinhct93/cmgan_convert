@@ -37,10 +37,10 @@ ndf = 16
 
 
 [dataset_train]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/train"
+path = "/home/minhkhanh/Desktop/work/denoiser/dataset/sub_voice_bank_demand/train"
     [dataset_train.dataloader]
-    batchsize = 4
-    n_worker = 4
+    batchsize = 1
+    n_worker = 2
     pin_memory = true
 
     [dataset_train.sampler]
@@ -48,18 +48,18 @@ path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_vale
     drop_last = true
     
 [dataset_valid]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
+path = "/home/minhkhanh/Desktop/work/denoiser/dataset/sub_voice_bank_demand/test"
     
     [dataset_valid.dataloader]
-    batchsize = 4
-    n_worker = 4
+    batchsize = 1
+    n_worker = 2
 
     [dataset_valid.sampler]
     shuffle = false
     drop_last = false 
 
 [dataset_test]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
+path = "/home/minhkhanh/Desktop/work/denoiser/dataset/sub_voice_bank_demand/test"
 
 
 [optimizer]

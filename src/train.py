@@ -81,7 +81,8 @@ def entry(rank, world_size, config):
     set_seed(config["main"]["seed"])
 
     # Create train dataloader
-    train_ds = dataloader.load_data(
+    train_ds = dataloader.load_data(    
+                                        True,
                                         config['dataset_train']['path'], 
                                         batch_size = config['dataset_train']['dataloader']['batchsize'], 
                                         n_cpu = config['dataset_train']['dataloader']['n_worker'], 
@@ -91,7 +92,8 @@ def entry(rank, world_size, config):
                                         shuffle = config['dataset_train']['sampler']['shuffle']
                                     )
 
-    test_ds = dataloader.load_data (
+    test_ds = dataloader.load_data (    
+                                        False,
                                         config['dataset_valid']['path'], 
                                         batch_size = config['dataset_valid']['dataloader']['batchsize'], 
                                         n_cpu = config['dataset_valid']['dataloader']['n_worker'], 
@@ -100,6 +102,9 @@ def entry(rank, world_size, config):
                                         world_size = world_size,
                                         shuffle = config['dataset_valid']['sampler']['shuffle']
                                     )
+
+    logger.info(f"Total sample in trainset: {len(train_ds)}")
+    logger.info(f"Total sample in testset: {len(test_ds)}")
 
     # model
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
@@ -136,7 +141,6 @@ def entry(rank, world_size, config):
     trainer_class = initialize_module(config["trainer"]["path"], initialize=False)
 
     trainer = trainer_class(
-        only_eval = only_eval,
         dist = dist,
         rank = rank,
         resume = resume,

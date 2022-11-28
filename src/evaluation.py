@@ -82,24 +82,7 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
 
     audio_list = os.listdir(noisy_dir)
     audio_list = natsorted(audio_list)
-    num = len(audio_list)
-    metrics_total = np.zeros(6)
-    # for audio in audio_list:
-    #     noisy_path = os.path.join(noisy_dir, audio)
-    #     clean_path = os.path.join(clean_dir, audio)
-    #     try:
-    #         est_audio, length = enhance_one_track(model, noisy_path, saved_dir, 16000*10, n_fft, n_fft//4, save_tracks)
-    #     except: 
-    #         continue
-    #     clean_audio, sr = sf.read(clean_path)
-    #     assert sr == 16000
-    #     metrics = compute_metrics(clean_audio, est_audio, sr, 0)
-    #     metrics = np.array(metrics)
-    #     print("audio - {} - metric {}".format(audio, metrics))
-    #     metrics_total += metrics
-
-    # metrics_avg = metrics_total / num
-
+    
     ls_est_audio = Parallel(n_jobs=1)(
                 delayed(enhance_one_track)(model, 
                                             os.path.join(noisy_dir, audio),
@@ -109,8 +92,6 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
                                             n_fft//4, 
                                             save_tracks
                                             ) for audio in audio_list)
-    print(audio_list[:10])
-    print(ls_est_audio[0][0])
     
     sr = 16000
     metrics = Parallel(n_jobs=1)(
@@ -120,7 +101,7 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
                                 0) for i in range(len(ls_est_audio))
     )
 
-    metrics_avg = np.mean(metrics)
+    metrics_avg = np.mean(metrics, 0)
 
     print('pesq: ', metrics_avg[0], 'csig: ', metrics_avg[1], 'cbak: ', metrics_avg[2], 'covl: ',
           metrics_avg[3], 'ssnr: ', metrics_avg[4], 'stoi: ', metrics_avg[5])
@@ -134,39 +115,27 @@ def evaluation_model(model, noisy_dir, clean_dir, save_tracks, saved_dir):
 
     audio_list = os.listdir(noisy_dir)
     audio_list = natsorted(audio_list)
-    num = len(audio_list)
-    metrics_total = np.zeros(6)
-    # for audio in audio_list:
-    #     noisy_path = os.path.join(noisy_dir, audio)
-    #     clean_path = os.path.join(clean_dir, audio)
-    #     try:
-    #         est_audio, length = enhance_one_track(model, noisy_path, saved_dir, 16000*10, n_fft, n_fft//4, save_tracks)
-    #     except: 
-    #         continue
-    #     clean_audio, sr = sf.read(clean_path)
-    #     assert sr == 16000
-    #     metrics = compute_metrics(clean_audio, est_audio, sr, 0)
-    #     metrics = np.array(metrics)
-    #     metrics_total += metrics
-
-    ls_est_audio, ls_length = Parallel(n_jobs=8)(
+    
+    ls_est_audio = Parallel(n_jobs=1)(
                 delayed(enhance_one_track)(model, 
                                             os.path.join(noisy_dir, audio),
-                                            os.path.join(clean_dir, audio),
+                                            saved_dir,
                                             16000*10, 
                                             n_fft, 
                                             n_fft//4, 
                                             save_tracks
                                             ) for audio in audio_list)
-    print(audio_list[:10])
-    print(ls_est_audio[:10])
     
-    metrics = Parallel(n_jobs=8)(
-        delayed(compute_metrics)(os.path.join(clean_dir,audio_list[i]),
-                                est_audio) for i in range(ls_est_audio)
+    sr = 16000
+    metrics = Parallel(n_jobs=1)(
+        delayed(compute_metrics)(sf.read(os.path.join(clean_dir, audio_list[i]))[0],
+                                ls_est_audio[i][0],
+                                sr,
+                                0) for i in range(len(ls_est_audio))
     )
 
-    metrics_avg = np.mean(metrics)
+    metrics_avg = np.mean(metrics, 0)
+    
     # print('pesq: ', metrics_avg[0], 'csig: ', metrics_avg[1], 'cbak: ', metrics_avg[2], 'covl: ',
     #       metrics_avg[3], 'ssnr: ', metrics_avg[4], 'stoi: ', metrics_avg[5])
 

@@ -3,6 +3,7 @@ from torch.utils.data.distributed import DistributedSampler
 from torch.utils.data import DataLoader, Subset
 from torch.nn.parallel.distributed import DistributedDataParallel
 import torchaudio
+from torch.nn import functional as F
 import os
 from utils import *
 import random
@@ -10,6 +11,17 @@ from natsort import natsorted
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
 
+
+def load_audio(audio_path, offset, num_frames):
+    if torchaudio.get_audio_backend() in ['soundfile', 'sox_io']:
+        out, sr = torchaudio.load(audio_path,
+                                frame_offset=offset,
+                                num_frames=num_frames or -1)
+    else:
+        out, sr = torchaudio.load(audio_path, 
+                                offset=offset, 
+                                num_frames=num_frames)
+    return out
 
 class DemandDataset(torch.utils.data.Dataset):
     def __init__(self, data_dir, cut_len=16000*2):
@@ -51,6 +63,51 @@ class DemandDataset(torch.utils.data.Dataset):
 
         return clean_ds, noisy_ds, length
 
+class Audioset:
+    def __init__(self, data_dir, cut_len=16000*2):
+        """
+        files should be a list [(file, length)]
+        """
+        self.cut_len = cut_len
+        self.data_dir = data_dir
+        self.clean_dir = os.path.join(data_dir, 'clean')
+        self.wav_name = os.listdir(self.clean_dir)
+        self.wav_name = natsorted(self.wav_name)
+        self.num_examples = []
+
+        examples = 1
+        for file in self.wav_name:
+            clean_ds, _ = torchaudio.load(os.path.join(data_dir, "clean", file))
+            file_length = clean_ds.shape[0]
+            if file_length < cut_len:
+                examples = 1
+            else:
+                examples = (file_length-cut_len) // cut_len + 1
+            self.num_examples.append(examples)
+
+    def __len__(self):
+        return sum(self.num_examples)
+
+    def __getitem__(self, index):
+        for file, examples in zip(self.wav_name, self.num_examples):
+            if index >= examples:
+                index -= examples
+                continue
+            num_frames = 0
+            offset = 0
+            if self.cut_len is not None:
+                offset = self.cut_len * index
+                num_frames = self.cut_len
+            
+            clean_audio = load_audio(os.path.join(self.data_dir, "clean", str(file)), offset, num_frames)
+            noisy_audio = load_audio(os.path.join(self.data_dir, "noisy", str(file)), offset, num_frames)
+
+            if num_frames:
+                clean_audio = F.pad(clean_audio, (0, num_frames - clean_audio.shape[-1]))
+                noisy_audio = F.pad(noisy_audio, (0, num_frames - noisy_audio.shape[-1]))
+            
+            assert len(clean_audio) == len(noisy_audio)
+            return clean_audio.squeeze(), noisy_audio.squeeze(), len(clean_audio)
 
 def load_data(ds_dir, batch_size, n_cpu, cut_len, rank, world_size):
     torchaudio.set_audio_backend("sox_io")         # in linux
@@ -76,9 +133,12 @@ def load_data(ds_dir, batch_size, n_cpu, cut_len, rank, world_size):
 
     return train_dataset, test_dataset
 
-def load_data(data_dir, batch_size, n_cpu, cut_len, rank, world_size, shuffle):
+def load_data(is_train, data_dir, batch_size, n_cpu, cut_len, rank, world_size, shuffle):
     torchaudio.set_audio_backend("sox_io")         # in linux
-    dataset_ds = DemandDataset(data_dir, cut_len)
+    if is_train:
+        dataset_ds = DemandDataset(data_dir, cut_len)
+    else:
+        dataset_ds = Audioset(data_dir, cut_len)
 
     sampler = DistributedSampler(dataset=dataset_ds, num_replicas=world_size, rank=rank, shuffle=shuffle)
     train_dataset = torch.utils.data.DataLoader(dataset=dataset_ds, 
