@@ -1,6 +1,7 @@
 import numpy as np
 from joblib import Parallel, delayed
 from pesq import pesq
+from tools.compute_metrics import stoi
 from utils import *
 
 
@@ -14,7 +15,7 @@ def pesq_loss(clean, noisy, sr=16000):
 
 
 def batch_pesq(clean, noisy, n_jobs):
-    pesq_score = Parallel(n_jobs=n_jobs)(delayed(pesq_loss)(c, n) for c, n in zip(clean, noisy))
+    pesq_score = Parallel(n_jobs=n_jobs*2)(delayed(pesq_loss)(c, n) for c, n in zip(clean, noisy))
     pesq_score = np.array(pesq_score)
     if -1 in pesq_score:
         print("PESQ: ", pesq_score)
@@ -25,6 +26,11 @@ def batch_pesq(clean, noisy, n_jobs):
     pesq_score = (pesq_score - 1) / 3.5
     return torch.FloatTensor(pesq_score).to('cuda')
 
+def batch_stoi(clean, noisy, n_jobs):
+    stoi_score = Parallel(n_jobs=n_jobs*2)(delayed(stoi)(c, n, 16000) for c, n in zip(clean, noisy))
+    stoi_score = np.array(stoi_score)
+        
+    return torch.FloatTensor(stoi_score).to('cuda')
 
 class Discriminator(nn.Module):
     def __init__(self, ndf, in_channel=2):

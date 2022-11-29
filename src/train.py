@@ -103,8 +103,8 @@ def entry(rank, world_size, config):
                                         shuffle = config['dataset_valid']['sampler']['shuffle']
                                     )
 
-    logger.info(f"Total sample in trainset: {len(train_ds)}")
-    logger.info(f"Total sample in testset: {len(test_ds)}")
+    logger.info(f"Total iteration through trainset: {len(train_ds)}")
+    logger.info(f"Total iteration through testset: {len(test_ds)}")
 
     # model
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)

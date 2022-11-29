@@ -447,7 +447,11 @@ def removeSilentFrames(x, y, dyrange, N, K):
     for j in range(np.size(frames)):
         jj_list[j, :] = np.arange(frames[j] - 1, frames[j] + N - 1)
 
-    msk = 20 * np.log10(np.divide(norm(np.multiply(x[jj_list], w), axis=1), np.sqrt(N)))
+    if np.sqrt(N)==0.0:
+        print("Divide by zeros")
+
+    with np.errstate(divide='ignore'):
+        msk = 20 * np.log10(np.divide(norm(np.multiply(x[jj_list], w), axis=1), np.sqrt(N)))
 
     msk = (msk - np.max(msk) + dyrange) > 0
     count = 0

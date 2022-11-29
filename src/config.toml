@@ -1,5 +1,5 @@
 [main]
-name = "CMGAN_sub_valentini_use_amp_remix"
+name = "CMGAN_sub_valentini_new_eval_dataloader_new_best_score_2"
 seed = 42
 epochs = 127
 cut_len = 32000
@@ -7,7 +7,7 @@ save_model_dir = "./save_model"
 use_amp = true # whether to use Automatic precision to speed up 
 # device_ids = "0,1,2"
 sr = 16000
-interval_eval = 1
+interval_eval = 5
 resume = true
 max_clip_grad_norm = 2.0 # torch.nn.utils.max_clip_grad_norm
 gradient_accumulation_steps = 1
@@ -37,10 +37,10 @@ ndf = 16
 
 
 [dataset_train]
-path = "/home/minhkhanh/Desktop/work/denoiser/dataset/sub_voice_bank_demand/train"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/train"
     [dataset_train.dataloader]
-    batchsize = 1
-    n_worker = 2
+    batchsize = 4
+    n_worker = 4
     pin_memory = true
 
     [dataset_train.sampler]
@@ -48,18 +48,18 @@ path = "/home/minhkhanh/Desktop/work/denoiser/dataset/sub_voice_bank_demand/trai
     drop_last = true
     
 [dataset_valid]
-path = "/home/minhkhanh/Desktop/work/denoiser/dataset/sub_voice_bank_demand/test"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
     
     [dataset_valid.dataloader]
-    batchsize = 1
-    n_worker = 2
+    batchsize = 4
+    n_worker = 4
 
     [dataset_valid.sampler]
     shuffle = false
     drop_last = false 
 
 [dataset_test]
-path = "/home/minhkhanh/Desktop/work/denoiser/dataset/sub_voice_bank_demand/test"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
 
 
 [optimizer]
