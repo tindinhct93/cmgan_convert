@@ -78,8 +78,7 @@ class Trainer(BaseTrainer):
         self.hop = hop
         self.scaler = scaler
 
-        self.best_score = 0.0
-        self.loss = float('inf')
+        self.best_loss = float('inf')
         self.best_state = None
         self.epoch_start = 0
         self.save_enhanced_dir = self.save_model_dir + "/enhanced_sample"
@@ -124,8 +123,7 @@ class Trainer(BaseTrainer):
         package['optimizer'] = self.optimizer.state_dict()
         package['optimizer_disc'] = self.optimizer_disc.state_dict()
         package['best_state'] = self.best_state
-        package['loss'] = self.loss
-        package['score'] = self.best_score
+        package['loss'] = self.best_loss
         package['epoch'] = epoch
         package['scaler'] = self.scaler
         tmp_path = os.path.join(self.save_model_dir, "checkpoint.tar")
@@ -159,16 +157,13 @@ class Trainer(BaseTrainer):
             self.optimizer.load_state_dict(package['optimizer'])
             self.optimizer_disc.load_state_dict(package['optimizer_disc'])
             self.epoch_start = package['epoch'] + 1
-            self.loss = package['loss']
-            self.best_score = package['score']
+            self.best_loss = package['loss']
             self.best_state = package['best_state']
             self.scaler = package['scaler']
             if self.rank == 0:
                 self.logger.info(f"Model checkpoint loaded. Training will begin at {self.epoch_start} epoch.")
                 self.logger.info(f"Load pretrained info: ")
-                self.logger.info(f"loss: {self.loss}")
-                self.logger.info(f"Best score: {self.best_score}")
-
+                self.logger.info(f"Best loss: {self.best_loss}")
 
 
     def _train_step(self, batch):
@@ -297,23 +292,21 @@ class Trainer(BaseTrainer):
             self.tsb_writer.add_scalar("Loss_gen/train", gen_loss_train, epoch)
             self.tsb_writer.add_scalar("Loss_disc/train", disc_loss_train, epoch)
 
-        gen_loss_valid, disc_loss_valid, score_valid = self._valid_epoch(epoch)
+        gen_loss_valid, disc_loss_valid = self._valid_epoch(epoch)
 
          # save best checkpoint
         if self.rank == 0:
-            template = 'Generator loss: {}, Discriminator loss: {}, Score_valid: {}'
-            info = template.format(gen_loss_valid, disc_loss_valid, score_valid)
+            template = 'Generator loss: {}, Discriminator loss: {}'
+            info = template.format(gen_loss_valid, disc_loss_valid)
             self.logger.info(bold(f"             - Overall Summary Validation | {info}"))
             self.logger.info('-' * 70)
 
             self.tsb_writer.add_scalar("Loss_gen/valid", gen_loss_valid, epoch)
             self.tsb_writer.add_scalar("Loss_disc/valid", disc_loss_valid, epoch)
-            self.tsb_writer.add_scalar("score_valid/valid", score_valid, epoch)
 
-            self.best_score = max(self.best_score, score_valid)
-            if score_valid == self.best_score:
+            self.best_loss = min(self.best_loss, gen_loss_valid)
+            if gen_loss_valid == self.best_loss:
                 self.best_state = copy_state(self.model.state_dict())
-                self.loss = gen_loss_valid
 
             if epoch % self.interval_eval == 0:
                 metrics_avg = evaluation_model(self.model, 
@@ -329,6 +322,7 @@ class Trainer(BaseTrainer):
                 # print("Evaluation epoch {} -- {}".format(epoch, info))
                 self.logger.info(bold(f"     Evaluation Summary:  | Epoch {epoch} | {info}"))
 
+            # Save checkpoint
             self._serialize(epoch)
 
         self.dist.barrier() # see https://stackoverflow.com/questions/59760328/how-does-torch-distributed-barrier-work
@@ -397,9 +391,8 @@ class Trainer(BaseTrainer):
         if self.n_gpus > 1:
             loss = self.gather(loss).mean()
             discrim_loss_metric = self.gather(discrim_loss_metric).mean()
-            pesq_score = self.gather(pesq_score).mean() * 3.5 + 1
 
-        return loss.item(), discrim_loss_metric.item(), pesq_score.item()
+        return loss.item(), discrim_loss_metric.item()
 
     def _valid_epoch(self, epoch):
 
@@ -408,20 +401,16 @@ class Trainer(BaseTrainer):
 
         gen_loss_total = 0.
         disc_loss_total = 0.
-        pesq_score_total = 0.
         for idx, batch in enumerate(self.test_ds):
             step = idx + 1
-            loss, disc_loss, pesq_score = self.test_step(batch)
+            loss, disc_loss = self.test_step(batch)
             gen_loss_total += loss
             disc_loss_total += disc_loss
-            pesq_score_total += pesq_score
 
         gen_loss_avg = gen_loss_total / step
         disc_loss_avg = disc_loss_total / step
 
-        pesq_score_avg = pesq_score_total / step
-
-        return gen_loss_avg, disc_loss_avg, pesq_score_avg
+        return gen_loss_avg, disc_loss_avg
 
 
     
