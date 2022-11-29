@@ -1,5 +1,5 @@
 [main]
-name = "CMGAN_sub_valentini_new_eval_dataloader_new_best_score_2"
+name = "CMGAN_sub_valentini_new_eval_dataloader_new_best_score_3"
 seed = 42
 epochs = 127
 cut_len = 32000

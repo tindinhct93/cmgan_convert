@@ -101,7 +101,7 @@ class Audioset:
             
             clean_audio = load_audio(os.path.join(self.data_dir, "clean", str(file)), offset, num_frames)
             noisy_audio = load_audio(os.path.join(self.data_dir, "noisy", str(file)), offset, num_frames)
-            
+
             length = clean_audio.shape[-1]
             if length < self.cut_len:
                 units = self.cut_len // length
@@ -110,13 +110,14 @@ class Audioset:
                 for i in range(units):
                     clean_ds_final.append(clean_audio)
                     noisy_ds_final.append(noisy_audio)
-                clean_ds_final.append(clean_audio[: self.cut_len%length])
-                noisy_ds_final.append(noisy_audio[: self.cut_len%length])
+                clean_ds_final.append(clean_audio[:, :self.cut_len%length])
+                noisy_ds_final.append(noisy_audio[:, :self.cut_len%length])
 
                 clean_audio = torch.cat(clean_ds_final, dim=-1)
                 noisy_audio = torch.cat(noisy_ds_final, dim=-1)
             
-            assert len(clean_audio) == len(noisy_audio)
+
+            assert clean_audio.shape[-1] == noisy_audio.shape[-1], "dimension difference between clean audio and noisy audio"
             return clean_audio.squeeze(), noisy_audio.squeeze(), len(clean_audio)
 
 def load_data(ds_dir, batch_size, n_cpu, cut_len, rank, world_size):

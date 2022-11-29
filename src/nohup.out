@@ -99122,3 +99122,1588 @@ Traceback (most recent call last):
   File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/utils/data/_utils/signal_handling.py", line 66, in handler
     _error_if_any_worker_fails()
 RuntimeError: DataLoader worker (pid 3191741) is killed by signal: Terminated. 
+Traceback (most recent call last):
+  File "/data1/speech/khanhnnm/cmgan_denoiser/src/train.py", line 205, in <module>
+    mp.spawn(entry,
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 230, in spawn
+    return start_processes(fn, args, nprocs, join, daemon, start_method='spawn')
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 188, in start_processes
+    while not context.join():
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 150, in join
+    raise ProcessRaisedException(msg, error_index, failed_process.pid)
+torch.multiprocessing.spawn.ProcessRaisedException: 
+
+-- Process 5 terminated with the following error:
+Traceback (most recent call last):
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/multiprocessing/spawn.py", line 59, in _wrap
+    fn(i, *args)
+  File "/data1/speech/khanhnnm/cmgan_denoiser/src/train.py", line 179, in entry
+    trainer.train()
+  File "/data1/speech/khanhnnm/cmgan_denoiser/src/base/base_trainer.py", line 68, in train
+    self._train_epoch(epoch)
+  File "/data1/speech/khanhnnm/cmgan_denoiser/src/trainer/trainer.py", line 300, in _train_epoch
+    gen_loss_valid, disc_loss_valid, score_valid = self._valid_epoch(epoch)
+  File "/data1/speech/khanhnnm/cmgan_denoiser/src/trainer/trainer.py", line 412, in _valid_epoch
+    for idx, batch in enumerate(self.test_ds):
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 517, in __next__
+    data = self._next_data()
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1199, in _next_data
+    return self._process_data(data)
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/utils/data/dataloader.py", line 1225, in _process_data
+    data.reraise()
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/_utils.py", line 429, in reraise
+    raise self.exc_type(msg)
+RuntimeError: Caught RuntimeError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/utils/data/_utils/worker.py", line 202, in _worker_loop
+    data = fetcher.fetch(index)
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/utils/data/_utils/fetch.py", line 47, in fetch
+    return self.collate_fn(data)
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/utils/data/_utils/collate.py", line 83, in default_collate
+    return [default_collate(samples) for samples in transposed]
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/utils/data/_utils/collate.py", line 83, in <listcomp>
+    return [default_collate(samples) for samples in transposed]
+  File "/home/khanhnnm/anaconda3/envs/cmgan/lib/python3.9/site-packages/torch/utils/data/_utils/collate.py", line 55, in default_collate
+    return torch.stack(batch, 0, out=out)
+RuntimeError: stack expects each tensor to be equal size, but got [32000] at entry 0 and [60022] at entry 2
+
+
+Namespace(config='config.toml')
+GPU list: ['Quadro RTX 6000', 'Quadro RTX 6000', 'Quadro RTX 6000', 'Quadro RTX 6000', 'Quadro RTX 6000', 'Quadro RTX 6000', 'Quadro RTX 6000', 'Quadro RTX 6000']
+Number of gpu: 8
+2022-11-29 05:10:19;INFO;Total iteration through trainset: 32
+2022-11-29 05:10:19;INFO;Total iteration through testset: 4
+=========================================================================================================
+Layer (type:depth-idx)                                  Output Shape              Param #
+=========================================================================================================
+DistributedDataParallel                                 --                        --
+├─TSCNet: 1-1                                           [2, 1, 321, 201]          --
+│    └─DenseEncoder: 2-1                                [2, 64, 321, 101]         --
+│    │    └─Sequential: 3-1                             [2, 64, 321, 201]         448
+│    │    └─DilatedDenseNet: 3-2                        [2, 64, 321, 201]         246,784
+│    │    └─Sequential: 3-3                             [2, 64, 321, 101]         12,544
+│    └─TSCB: 2-2                                        [2, 64, 321, 101]         --
+│    │    └─ConformerBlock: 3-4                         [202, 321, 64]            128,912
+│    │    └─ConformerBlock: 3-5                         [642, 101, 64]            128,912
+│    └─TSCB: 2-3                                        [2, 64, 321, 101]         --
+│    │    └─ConformerBlock: 3-6                         [202, 321, 64]            128,912
+│    │    └─ConformerBlock: 3-7                         [642, 101, 64]            128,912
+│    └─TSCB: 2-4                                        [2, 64, 321, 101]         --
+│    │    └─ConformerBlock: 3-8                         [202, 321, 64]            128,912
+│    │    └─ConformerBlock: 3-9                         [642, 101, 64]            128,912
+│    └─TSCB: 2-5                                        [2, 64, 321, 101]         --
+│    │    └─ConformerBlock: 3-10                        [202, 321, 64]            128,912
+│    │    └─ConformerBlock: 3-11                        [642, 101, 64]            128,912
+│    └─MaskDecoder: 2-6                                 [2, 1, 321, 201]          --
+│    │    └─DilatedDenseNet: 3-12                       [2, 64, 321, 101]         246,784
+│    │    └─SPConvTranspose2d: 3-13                     [2, 64, 321, 202]         24,704
+│    │    └─Conv2d: 3-14                                [2, 1, 321, 201]          129
+│    │    └─InstanceNorm2d: 3-15                        [2, 1, 321, 201]          2
+│    │    └─PReLU: 3-16                                 [2, 1, 321, 201]          1
+│    │    └─Conv2d: 3-17                                [2, 1, 321, 201]          2
+│    │    └─PReLU: 3-18                                 [2, 201, 321]             201
+│    └─ComplexDecoder: 2-7                              [2, 2, 321, 201]          --
+│    │    └─DilatedDenseNet: 3-19                       [2, 64, 321, 101]         246,784
+│    │    └─SPConvTranspose2d: 3-20                     [2, 64, 321, 202]         24,704
+│    │    └─InstanceNorm2d: 3-21                        [2, 64, 321, 202]         128
+│    │    └─PReLU: 3-22                                 [2, 64, 321, 202]         64
+│    │    └─Conv2d: 3-23                                [2, 2, 321, 201]          258
+=========================================================================================================
+Total params: 1,834,833
+Trainable params: 1,834,833
+Non-trainable params: 0
+Total mult-adds (G): 83.09
+=========================================================================================================
+Input size (MB): 1.03
+Forward/backward pass size (MB): 9654.82
+Params size (MB): 7.34
+Estimated Total Size (MB): 9663.19
+=========================================================================================================
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+DistributedDataParallel                  --                        --
+├─Discriminator: 1-1                     [1, 1]                    --
+│    └─Sequential: 2-1                   [1, 1]                    --
+│    │    └─Conv2d: 3-1                  [1, 16, 100, 160]         512
+│    │    └─InstanceNorm2d: 3-2          [1, 16, 100, 160]         32
+│    │    └─PReLU: 3-3                   [1, 16, 100, 160]         16
+│    │    └─Conv2d: 3-4                  [1, 32, 50, 80]           8,192
+│    │    └─InstanceNorm2d: 3-5          [1, 32, 50, 80]           64
+│    │    └─PReLU: 3-6                   [1, 32, 50, 80]           32
+│    │    └─Conv2d: 3-7                  [1, 64, 25, 40]           32,768
+│    │    └─InstanceNorm2d: 3-8          [1, 64, 25, 40]           128
+│    │    └─PReLU: 3-9                   [1, 64, 25, 40]           64
+│    │    └─Conv2d: 3-10                 [1, 128, 12, 20]          131,072
+│    │    └─InstanceNorm2d: 3-11         [1, 128, 12, 20]          256
+│    │    └─PReLU: 3-12                  [1, 128, 12, 20]          128
+│    │    └─AdaptiveMaxPool2d: 3-13      [1, 128, 1, 1]            --
+│    │    └─Flatten: 3-14                [1, 128]                  --
+│    │    └─Linear: 3-15                 [1, 64]                   8,256
+│    │    └─Dropout: 3-16                [1, 64]                   --
+│    │    └─PReLU: 3-17                  [1, 64]                   64
+│    │    └─Linear: 3-18                 [1, 1]                    65
+│    │    └─LearnableSigmoid: 3-19       [1, 1]                    1
+==========================================================================================
+Total params: 181,650
+Trainable params: 181,650
+Non-trainable params: 0
+Total mult-adds (M): 19.67
+==========================================================================================
+Input size (MB): 0.52
+Forward/backward pass size (MB): 11.49
+Params size (MB): 0.73
+Estimated Total Size (MB): 12.73
+==========================================================================================
+2022-11-29 05:10:35;INFO;
+ <Epoch>: 0 -- Start training 
+2022-11-29 05:11:01;INFO;Train | Epoch 0 | 6/32 | 0.3 it/sec | Gen_loss 0.34330 | Disc_loss 0.80213
+2022-11-29 05:11:10;INFO;Train | Epoch 0 | 12/32 | 0.4 it/sec | Gen_loss 0.25819 | Disc_loss 0.66986
+2022-11-29 05:11:19;INFO;Train | Epoch 0 | 18/32 | 0.4 it/sec | Gen_loss 0.21080 | Disc_loss 0.58053
+2022-11-29 05:11:28;INFO;Train | Epoch 0 | 24/32 | 0.5 it/sec | Gen_loss 0.21855 | Disc_loss 0.63125
+2022-11-29 05:11:37;INFO;Train | Epoch 0 | 30/32 | 0.5 it/sec | Gen_loss 0.19307 | Disc_loss 0.59862
+2022-11-29 05:11:40;INFO;----------------------------------------------------------------------
+2022-11-29 05:11:40;INFO;[1m     Epoch 0 - Overall Summary Training | Generator loss: 0.27132547553628683, Discriminator loss: 0.6804707832634449[0m
+2022-11-29 05:11:49;INFO;[1m             - Overall Summary Validation | Generator loss: 0.12621364556252956, Discriminator loss: 0.33025532215833664, Score_valid: 2.6258078813552856[0m
+2022-11-29 05:11:49;INFO;----------------------------------------------------------------------
+2022-11-29 05:13:41;INFO;[1m     Evaluation Summary:  | Epoch 0 | Pesq 2.54626 | Csig 3.76491 | Cbak 3.07427 | Covl 3.19806 | Ssnr 4.27093 | Stoi 0.90598[0m
+2022-11-29 05:13:42;INFO;
+ <Epoch>: 1 -- Start training 
+2022-11-29 05:13:56;INFO;Train | Epoch 1 | 6/32 | 0.5 it/sec | Gen_loss 0.19185 | Disc_loss 0.64325
+2022-11-29 05:14:05;INFO;Train | Epoch 1 | 12/32 | 0.6 it/sec | Gen_loss 0.16314 | Disc_loss 0.53821
+2022-11-29 05:14:14;INFO;Train | Epoch 1 | 18/32 | 0.6 it/sec | Gen_loss 0.15808 | Disc_loss 0.49934
+2022-11-29 05:14:22;INFO;Train | Epoch 1 | 24/32 | 0.6 it/sec | Gen_loss 0.18201 | Disc_loss 0.60861
+2022-11-29 05:14:31;INFO;Train | Epoch 1 | 30/32 | 0.6 it/sec | Gen_loss 0.16181 | Disc_loss 0.56382
+2022-11-29 05:14:34;INFO;----------------------------------------------------------------------
+2022-11-29 05:14:34;INFO;[1m     Epoch 1 - Overall Summary Training | Generator loss: 0.1789427283219993, Discriminator loss: 0.5877644447609782[0m
+2022-11-29 05:14:43;INFO;[1m             - Overall Summary Validation | Generator loss: 0.09484965912997723, Discriminator loss: 0.30203109979629517, Score_valid: 2.7198835611343384[0m
+2022-11-29 05:14:43;INFO;----------------------------------------------------------------------
+2022-11-29 05:14:43;INFO;
+ <Epoch>: 2 -- Start training 
+2022-11-29 05:14:58;INFO;Train | Epoch 2 | 6/32 | 0.5 it/sec | Gen_loss 0.16472 | Disc_loss 0.60766
+2022-11-29 05:15:06;INFO;Train | Epoch 2 | 12/32 | 0.6 it/sec | Gen_loss 0.14257 | Disc_loss 0.52226
+2022-11-29 05:15:15;INFO;Train | Epoch 2 | 18/32 | 0.6 it/sec | Gen_loss 0.13659 | Disc_loss 0.45615
+2022-11-29 05:15:24;INFO;Train | Epoch 2 | 24/32 | 0.6 it/sec | Gen_loss 0.15975 | Disc_loss 0.61456
+2022-11-29 05:15:32;INFO;Train | Epoch 2 | 30/32 | 0.6 it/sec | Gen_loss 0.14384 | Disc_loss 0.57557
+2022-11-29 05:15:35;INFO;----------------------------------------------------------------------
+2022-11-29 05:15:35;INFO;[1m     Epoch 2 - Overall Summary Training | Generator loss: 0.1570452726446092, Discriminator loss: 0.5683561284095049[0m
+PESQ:  [ 1.98222065  2.84087229  1.14183676 -1.        ]
+2022-11-29 05:15:44;INFO;[1m             - Overall Summary Validation | Generator loss: 0.08643301017582417, Discriminator loss: 0.31435859203338623, Score_valid: 2.6810434460639954[0m
+2022-11-29 05:15:44;INFO;----------------------------------------------------------------------
+2022-11-29 05:15:45;INFO;
+ <Epoch>: 3 -- Start training 
+2022-11-29 05:15:59;INFO;Train | Epoch 3 | 6/32 | 0.5 it/sec | Gen_loss 0.16024 | Disc_loss 0.60292
+2022-11-29 05:16:08;INFO;Train | Epoch 3 | 12/32 | 0.6 it/sec | Gen_loss 0.13963 | Disc_loss 0.54057
+2022-11-29 05:16:17;INFO;Train | Epoch 3 | 18/32 | 0.6 it/sec | Gen_loss 0.13160 | Disc_loss 0.46139
+2022-11-29 05:16:25;INFO;Train | Epoch 3 | 24/32 | 0.6 it/sec | Gen_loss 0.15777 | Disc_loss 0.58623
+2022-11-29 05:16:34;INFO;Train | Epoch 3 | 30/32 | 0.6 it/sec | Gen_loss 0.13905 | Disc_loss 0.55736
+2022-11-29 05:16:37;INFO;----------------------------------------------------------------------
+2022-11-29 05:16:37;INFO;[1m     Epoch 3 - Overall Summary Training | Generator loss: 0.15027455845847726, Discriminator loss: 0.5587303787469864[0m
+2022-11-29 05:16:45;INFO;[1m             - Overall Summary Validation | Generator loss: 0.08722374029457569, Discriminator loss: 0.3320506736636162, Score_valid: 2.6156667470932007[0m
+2022-11-29 05:16:45;INFO;----------------------------------------------------------------------
+2022-11-29 05:16:46;INFO;
+ <Epoch>: 4 -- Start training 
+2022-11-29 05:17:00;INFO;Train | Epoch 4 | 6/32 | 0.5 it/sec | Gen_loss 0.14847 | Disc_loss 0.60140
+2022-11-29 05:17:09;INFO;Train | Epoch 4 | 12/32 | 0.6 it/sec | Gen_loss 0.12334 | Disc_loss 0.49312
+2022-11-29 05:17:18;INFO;Train | Epoch 4 | 18/32 | 0.6 it/sec | Gen_loss 0.12180 | Disc_loss 0.44110
+2022-11-29 05:17:26;INFO;Train | Epoch 4 | 24/32 | 0.6 it/sec | Gen_loss 0.14578 | Disc_loss 0.58955
+2022-11-29 05:17:35;INFO;Train | Epoch 4 | 30/32 | 0.6 it/sec | Gen_loss 0.13395 | Disc_loss 0.52842
+2022-11-29 05:17:37;INFO;----------------------------------------------------------------------
+2022-11-29 05:17:37;INFO;[1m     Epoch 4 - Overall Summary Training | Generator loss: 0.1424296039622277, Discriminator loss: 0.5473539363592863[0m
+2022-11-29 05:17:46;INFO;[1m             - Overall Summary Validation | Generator loss: 0.07909496501088142, Discriminator loss: 0.31954750418663025, Score_valid: 2.65204519033432[0m
+2022-11-29 05:17:46;INFO;----------------------------------------------------------------------
+2022-11-29 05:17:47;INFO;
+ <Epoch>: 5 -- Start training 
+2022-11-29 05:18:00;INFO;Train | Epoch 5 | 6/32 | 0.5 it/sec | Gen_loss 0.14491 | Disc_loss 0.58433
+2022-11-29 05:18:09;INFO;Train | Epoch 5 | 12/32 | 0.6 it/sec | Gen_loss 0.11739 | Disc_loss 0.45915
+2022-11-29 05:18:17;INFO;Train | Epoch 5 | 18/32 | 0.6 it/sec | Gen_loss 0.11852 | Disc_loss 0.41692
+2022-11-29 05:18:26;INFO;Train | Epoch 5 | 24/32 | 0.6 it/sec | Gen_loss 0.14142 | Disc_loss 0.54444
+2022-11-29 05:18:34;INFO;Train | Epoch 5 | 30/32 | 0.7 it/sec | Gen_loss 0.12589 | Disc_loss 0.53300
+2022-11-29 05:18:37;INFO;----------------------------------------------------------------------
+2022-11-29 05:18:37;INFO;[1m     Epoch 5 - Overall Summary Training | Generator loss: 0.13530141254886985, Discriminator loss: 0.5319678233936429[0m
+2022-11-29 05:18:52;INFO;[1m             - Overall Summary Validation | Generator loss: 0.07607582584023476, Discriminator loss: 0.31253860890865326, Score_valid: 2.677288293838501[0m
+2022-11-29 05:18:52;INFO;----------------------------------------------------------------------
+2022-11-29 05:20:48;INFO;[1m     Evaluation Summary:  | Epoch 5 | Pesq 2.61038 | Csig 4.01218 | Cbak 3.37792 | Covl 3.36444 | Ssnr 8.30219 | Stoi 0.92488[0m
+2022-11-29 05:20:48;INFO;
+ <Epoch>: 6 -- Start training 
+2022-11-29 05:21:03;INFO;Train | Epoch 6 | 6/32 | 0.5 it/sec | Gen_loss 0.14245 | Disc_loss 0.55102
+2022-11-29 05:21:11;INFO;Train | Epoch 6 | 12/32 | 0.6 it/sec | Gen_loss 0.12225 | Disc_loss 0.44034
+2022-11-29 05:21:20;INFO;Train | Epoch 6 | 18/32 | 0.6 it/sec | Gen_loss 0.11593 | Disc_loss 0.43972
+2022-11-29 05:21:29;INFO;Train | Epoch 6 | 24/32 | 0.6 it/sec | Gen_loss 0.13829 | Disc_loss 0.55985
+2022-11-29 05:21:37;INFO;Train | Epoch 6 | 30/32 | 0.6 it/sec | Gen_loss 0.12770 | Disc_loss 0.52269
+2022-11-29 05:21:40;INFO;----------------------------------------------------------------------
+2022-11-29 05:21:40;INFO;[1m     Epoch 6 - Overall Summary Training | Generator loss: 0.13447720231488347, Discriminator loss: 0.5247664945200086[0m
+2022-11-29 05:21:49;INFO;[1m             - Overall Summary Validation | Generator loss: 0.07331309840083122, Discriminator loss: 0.29967983812093735, Score_valid: 2.716527223587036[0m
+2022-11-29 05:21:49;INFO;----------------------------------------------------------------------
+2022-11-29 05:21:50;INFO;
+ <Epoch>: 7 -- Start training 
+2022-11-29 05:22:04;INFO;Train | Epoch 7 | 6/32 | 0.5 it/sec | Gen_loss 0.14230 | Disc_loss 0.54781
+2022-11-29 05:22:13;INFO;Train | Epoch 7 | 12/32 | 0.6 it/sec | Gen_loss 0.11707 | Disc_loss 0.48517
+2022-11-29 05:22:21;INFO;Train | Epoch 7 | 18/32 | 0.6 it/sec | Gen_loss 0.11202 | Disc_loss 0.42752
+2022-11-29 05:22:30;INFO;Train | Epoch 7 | 24/32 | 0.6 it/sec | Gen_loss 0.14056 | Disc_loss 0.56024
+2022-11-29 05:22:38;INFO;Train | Epoch 7 | 30/32 | 0.6 it/sec | Gen_loss 0.12267 | Disc_loss 0.50432
+2022-11-29 05:22:41;INFO;----------------------------------------------------------------------
+2022-11-29 05:22:41;INFO;[1m     Epoch 7 - Overall Summary Training | Generator loss: 0.1301783479284495, Discriminator loss: 0.5144004244357347[0m
+2022-11-29 05:22:50;INFO;[1m             - Overall Summary Validation | Generator loss: 0.07215902768075466, Discriminator loss: 0.2979581132531166, Score_valid: 2.7177186012268066[0m
+2022-11-29 05:22:50;INFO;----------------------------------------------------------------------
+2022-11-29 05:22:50;INFO;
+ <Epoch>: 8 -- Start training 
+2022-11-29 05:23:05;INFO;Train | Epoch 8 | 6/32 | 0.5 it/sec | Gen_loss 0.13628 | Disc_loss 0.55342
+2022-11-29 05:23:13;INFO;Train | Epoch 8 | 12/32 | 0.6 it/sec | Gen_loss 0.11484 | Disc_loss 0.43112
+2022-11-29 05:23:22;INFO;Train | Epoch 8 | 18/32 | 0.6 it/sec | Gen_loss 0.11360 | Disc_loss 0.42996
+2022-11-29 05:23:31;INFO;Train | Epoch 8 | 24/32 | 0.6 it/sec | Gen_loss 0.13351 | Disc_loss 0.52618
+2022-11-29 05:23:39;INFO;Train | Epoch 8 | 30/32 | 0.6 it/sec | Gen_loss 0.12055 | Disc_loss 0.48431
+2022-11-29 05:23:42;INFO;----------------------------------------------------------------------
+2022-11-29 05:23:42;INFO;[1m     Epoch 8 - Overall Summary Training | Generator loss: 0.12755703553557396, Discriminator loss: 0.5061650173738599[0m
+2022-11-29 05:23:51;INFO;[1m             - Overall Summary Validation | Generator loss: 0.07302927412092686, Discriminator loss: 0.2889978736639023, Score_valid: 2.7479247450828552[0m
+2022-11-29 05:23:51;INFO;----------------------------------------------------------------------
+2022-11-29 05:23:52;INFO;
+ <Epoch>: 9 -- Start training 
+2022-11-29 05:24:05;INFO;Train | Epoch 9 | 6/32 | 0.5 it/sec | Gen_loss 0.14359 | Disc_loss 0.55959
+2022-11-29 05:24:14;INFO;Train | Epoch 9 | 12/32 | 0.6 it/sec | Gen_loss 0.12003 | Disc_loss 0.44609
+2022-11-29 05:24:23;INFO;Train | Epoch 9 | 18/32 | 0.6 it/sec | Gen_loss 0.11013 | Disc_loss 0.42167
+2022-11-29 05:24:32;INFO;Train | Epoch 9 | 24/32 | 0.6 it/sec | Gen_loss 0.13070 | Disc_loss 0.53619
+2022-11-29 05:24:40;INFO;Train | Epoch 9 | 30/32 | 0.6 it/sec | Gen_loss 0.11979 | Disc_loss 0.50010
+2022-11-29 05:24:43;INFO;----------------------------------------------------------------------
+2022-11-29 05:24:43;INFO;[1m     Epoch 9 - Overall Summary Training | Generator loss: 0.1265066855121404, Discriminator loss: 0.4993705628439784[0m
+2022-11-29 05:24:52;INFO;[1m             - Overall Summary Validation | Generator loss: 0.07213703356683254, Discriminator loss: 0.30209430307149887, Score_valid: 2.7066267132759094[0m
+2022-11-29 05:24:52;INFO;----------------------------------------------------------------------
+2022-11-29 05:24:52;INFO;
+ <Epoch>: 10 -- Start training 
+2022-11-29 05:25:06;INFO;Train | Epoch 10 | 6/32 | 0.5 it/sec | Gen_loss 0.13966 | Disc_loss 0.54342
+2022-11-29 05:25:15;INFO;Train | Epoch 10 | 12/32 | 0.6 it/sec | Gen_loss 0.10891 | Disc_loss 0.44036
+2022-11-29 05:25:24;INFO;Train | Epoch 10 | 18/32 | 0.6 it/sec | Gen_loss 0.10644 | Disc_loss 0.41181
+2022-11-29 05:25:32;INFO;Train | Epoch 10 | 24/32 | 0.6 it/sec | Gen_loss 0.13989 | Disc_loss 0.53640
+2022-11-29 05:25:41;INFO;Train | Epoch 10 | 30/32 | 0.6 it/sec | Gen_loss 0.11601 | Disc_loss 0.49155
+2022-11-29 05:25:43;INFO;----------------------------------------------------------------------
+2022-11-29 05:25:43;INFO;[1m     Epoch 10 - Overall Summary Training | Generator loss: 0.12612811429426074, Discriminator loss: 0.49952785950154066[0m
+2022-11-29 05:25:52;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06836633384227753, Discriminator loss: 0.27841316908597946, Score_valid: 2.7906208634376526[0m
+2022-11-29 05:25:52;INFO;----------------------------------------------------------------------
+2022-11-29 05:27:44;INFO;[1m     Evaluation Summary:  | Epoch 10 | Pesq 2.74642 | Csig 4.17832 | Cbak 3.48500 | Covl 3.52109 | Ssnr 8.94539 | Stoi 0.93141[0m
+2022-11-29 05:27:44;INFO;
+ <Epoch>: 11 -- Start training 
+2022-11-29 05:27:58;INFO;Train | Epoch 11 | 6/32 | 0.5 it/sec | Gen_loss 0.12975 | Disc_loss 0.53010
+2022-11-29 05:28:07;INFO;Train | Epoch 11 | 12/32 | 0.6 it/sec | Gen_loss 0.10982 | Disc_loss 0.42862
+2022-11-29 05:28:15;INFO;Train | Epoch 11 | 18/32 | 0.6 it/sec | Gen_loss 0.10393 | Disc_loss 0.39243
+2022-11-29 05:28:24;INFO;Train | Epoch 11 | 24/32 | 0.6 it/sec | Gen_loss 0.13038 | Disc_loss 0.50555
+2022-11-29 05:28:32;INFO;Train | Epoch 11 | 30/32 | 0.7 it/sec | Gen_loss 0.11946 | Disc_loss 0.46874
+2022-11-29 05:28:35;INFO;----------------------------------------------------------------------
+2022-11-29 05:28:35;INFO;[1m     Epoch 11 - Overall Summary Training | Generator loss: 0.12198409182019532, Discriminator loss: 0.4840158922597766[0m
+2022-11-29 05:28:44;INFO;[1m             - Overall Summary Validation | Generator loss: 0.07066197693347931, Discriminator loss: 0.2977076694369316, Score_valid: 2.720880627632141[0m
+2022-11-29 05:28:44;INFO;----------------------------------------------------------------------
+2022-11-29 05:28:44;INFO;
+ <Epoch>: 12 -- Start training 
+2022-11-29 05:28:58;INFO;Train | Epoch 12 | 6/32 | 0.5 it/sec | Gen_loss 0.12994 | Disc_loss 0.52696
+2022-11-29 05:29:06;INFO;Train | Epoch 12 | 12/32 | 0.6 it/sec | Gen_loss 0.10481 | Disc_loss 0.42598
+2022-11-29 05:29:15;INFO;Train | Epoch 12 | 18/32 | 0.6 it/sec | Gen_loss 0.10312 | Disc_loss 0.40858
+2022-11-29 05:29:24;INFO;Train | Epoch 12 | 24/32 | 0.6 it/sec | Gen_loss 0.12576 | Disc_loss 0.50853
+2022-11-29 05:29:32;INFO;Train | Epoch 12 | 30/32 | 0.7 it/sec | Gen_loss 0.11811 | Disc_loss 0.48428
+2022-11-29 05:29:35;INFO;----------------------------------------------------------------------
+2022-11-29 05:29:35;INFO;[1m     Epoch 12 - Overall Summary Training | Generator loss: 0.12107649887911975, Discriminator loss: 0.48470772895962[0m
+2022-11-29 05:29:43;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06836085580289364, Discriminator loss: 0.28797587007284164, Score_valid: 2.755915939807892[0m
+2022-11-29 05:29:43;INFO;----------------------------------------------------------------------
+2022-11-29 05:29:44;INFO;
+ <Epoch>: 13 -- Start training 
+2022-11-29 05:29:57;INFO;Train | Epoch 13 | 6/32 | 0.5 it/sec | Gen_loss 0.12980 | Disc_loss 0.55372
+2022-11-29 05:30:06;INFO;Train | Epoch 13 | 12/32 | 0.6 it/sec | Gen_loss 0.10767 | Disc_loss 0.43056
+2022-11-29 05:30:15;INFO;Train | Epoch 13 | 18/32 | 0.6 it/sec | Gen_loss 0.10313 | Disc_loss 0.38797
+2022-11-29 05:30:24;INFO;Train | Epoch 13 | 24/32 | 0.6 it/sec | Gen_loss 0.12539 | Disc_loss 0.49198
+2022-11-29 05:30:32;INFO;Train | Epoch 13 | 30/32 | 0.6 it/sec | Gen_loss 0.11865 | Disc_loss 0.48791
+2022-11-29 05:30:35;INFO;----------------------------------------------------------------------
+2022-11-29 05:30:35;INFO;[1m     Epoch 13 - Overall Summary Training | Generator loss: 0.11989792203530669, Discriminator loss: 0.478761020116508[0m
+2022-11-29 05:30:43;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06693817302584648, Discriminator loss: 0.2666899599134922, Score_valid: 2.827030837535858[0m
+2022-11-29 05:30:43;INFO;----------------------------------------------------------------------
+2022-11-29 05:30:44;INFO;
+ <Epoch>: 14 -- Start training 
+2022-11-29 05:30:57;INFO;Train | Epoch 14 | 6/32 | 0.5 it/sec | Gen_loss 0.12709 | Disc_loss 0.51176
+2022-11-29 05:31:06;INFO;Train | Epoch 14 | 12/32 | 0.6 it/sec | Gen_loss 0.10187 | Disc_loss 0.40774
+2022-11-29 05:31:14;INFO;Train | Epoch 14 | 18/32 | 0.6 it/sec | Gen_loss 0.10439 | Disc_loss 0.36736
+2022-11-29 05:31:23;INFO;Train | Epoch 14 | 24/32 | 0.6 it/sec | Gen_loss 0.12657 | Disc_loss 0.52633
+2022-11-29 05:31:31;INFO;Train | Epoch 14 | 30/32 | 0.7 it/sec | Gen_loss 0.11352 | Disc_loss 0.47335
+2022-11-29 05:31:34;INFO;----------------------------------------------------------------------
+2022-11-29 05:31:34;INFO;[1m     Epoch 14 - Overall Summary Training | Generator loss: 0.11821981007233262, Discriminator loss: 0.4745129654183984[0m
+2022-11-29 05:31:42;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06956633925437927, Discriminator loss: 0.2877126447856426, Score_valid: 2.7504178881645203[0m
+2022-11-29 05:31:42;INFO;----------------------------------------------------------------------
+2022-11-29 05:31:43;INFO;
+ <Epoch>: 15 -- Start training 
+2022-11-29 05:31:57;INFO;Train | Epoch 15 | 6/32 | 0.5 it/sec | Gen_loss 0.12480 | Disc_loss 0.47837
+2022-11-29 05:32:05;INFO;Train | Epoch 15 | 12/32 | 0.6 it/sec | Gen_loss 0.10295 | Disc_loss 0.40067
+2022-11-29 05:32:13;INFO;Train | Epoch 15 | 18/32 | 0.6 it/sec | Gen_loss 0.10059 | Disc_loss 0.37030
+2022-11-29 05:32:22;INFO;Train | Epoch 15 | 24/32 | 0.6 it/sec | Gen_loss 0.12566 | Disc_loss 0.51929
+2022-11-29 05:32:31;INFO;Train | Epoch 15 | 30/32 | 0.7 it/sec | Gen_loss 0.11168 | Disc_loss 0.47330
+2022-11-29 05:32:33;INFO;----------------------------------------------------------------------
+2022-11-29 05:32:33;INFO;[1m     Epoch 15 - Overall Summary Training | Generator loss: 0.11554464069195092, Discriminator loss: 0.46377676352858543[0m
+2022-11-29 05:32:42;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06835307274013758, Discriminator loss: 0.30027369409799576, Score_valid: 2.7220781445503235[0m
+2022-11-29 05:32:42;INFO;----------------------------------------------------------------------
+2022-11-29 05:34:33;INFO;[1m     Evaluation Summary:  | Epoch 15 | Pesq 2.68175 | Csig 4.15496 | Cbak 3.44104 | Covl 3.47466 | Ssnr 8.74847 | Stoi 0.92754[0m
+2022-11-29 05:34:34;INFO;
+ <Epoch>: 16 -- Start training 
+2022-11-29 05:34:48;INFO;Train | Epoch 16 | 6/32 | 0.5 it/sec | Gen_loss 0.12660 | Disc_loss 0.50642
+2022-11-29 05:34:56;INFO;Train | Epoch 16 | 12/32 | 0.6 it/sec | Gen_loss 0.10332 | Disc_loss 0.39408
+2022-11-29 05:35:05;INFO;Train | Epoch 16 | 18/32 | 0.6 it/sec | Gen_loss 0.09989 | Disc_loss 0.36099
+2022-11-29 05:35:13;INFO;Train | Epoch 16 | 24/32 | 0.6 it/sec | Gen_loss 0.12123 | Disc_loss 0.48872
+2022-11-29 05:35:21;INFO;Train | Epoch 16 | 30/32 | 0.7 it/sec | Gen_loss 0.10802 | Disc_loss 0.45299
+2022-11-29 05:35:24;INFO;----------------------------------------------------------------------
+2022-11-29 05:35:24;INFO;[1m     Epoch 16 - Overall Summary Training | Generator loss: 0.11490543512627482, Discriminator loss: 0.45943515840917826[0m
+2022-11-29 05:35:33;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06821064278483391, Discriminator loss: 0.3065432235598564, Score_valid: 2.6959607005119324[0m
+2022-11-29 05:35:33;INFO;----------------------------------------------------------------------
+2022-11-29 05:35:33;INFO;
+ <Epoch>: 17 -- Start training 
+2022-11-29 05:35:47;INFO;Train | Epoch 17 | 6/32 | 0.5 it/sec | Gen_loss 0.12168 | Disc_loss 0.48689
+2022-11-29 05:35:55;INFO;Train | Epoch 17 | 12/32 | 0.6 it/sec | Gen_loss 0.09976 | Disc_loss 0.40541
+2022-11-29 05:36:03;INFO;Train | Epoch 17 | 18/32 | 0.6 it/sec | Gen_loss 0.10170 | Disc_loss 0.39159
+2022-11-29 05:36:11;INFO;Train | Epoch 17 | 24/32 | 0.7 it/sec | Gen_loss 0.12130 | Disc_loss 0.50125
+2022-11-29 05:36:20;INFO;Train | Epoch 17 | 30/32 | 0.7 it/sec | Gen_loss 0.10587 | Disc_loss 0.43128
+2022-11-29 05:36:23;INFO;----------------------------------------------------------------------
+2022-11-29 05:36:23;INFO;[1m     Epoch 17 - Overall Summary Training | Generator loss: 0.11434060102328658, Discriminator loss: 0.459967777132988[0m
+PESQ:  [ 1.31590307  2.17111754  1.36481869 -1.        ]
+2022-11-29 05:36:31;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06679122149944305, Discriminator loss: 0.27568669989705086, Score_valid: 2.7892147302627563[0m
+2022-11-29 05:36:31;INFO;----------------------------------------------------------------------
+2022-11-29 05:36:32;INFO;
+ <Epoch>: 18 -- Start training 
+2022-11-29 05:36:45;INFO;Train | Epoch 18 | 6/32 | 0.5 it/sec | Gen_loss 0.12464 | Disc_loss 0.49674
+2022-11-29 05:36:53;INFO;Train | Epoch 18 | 12/32 | 0.6 it/sec | Gen_loss 0.10181 | Disc_loss 0.39531
+2022-11-29 05:37:02;INFO;Train | Epoch 18 | 18/32 | 0.6 it/sec | Gen_loss 0.09778 | Disc_loss 0.36741
+2022-11-29 05:37:10;INFO;Train | Epoch 18 | 24/32 | 0.7 it/sec | Gen_loss 0.12143 | Disc_loss 0.46766
+2022-11-29 05:37:19;INFO;Train | Epoch 18 | 30/32 | 0.7 it/sec | Gen_loss 0.11031 | Disc_loss 0.45215
+2022-11-29 05:37:21;INFO;----------------------------------------------------------------------
+2022-11-29 05:37:21;INFO;[1m     Epoch 18 - Overall Summary Training | Generator loss: 0.11176658514887094, Discriminator loss: 0.4556437162682414[0m
+2022-11-29 05:37:30;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06790407001972198, Discriminator loss: 0.27970318868756294, Score_valid: 2.785634696483612[0m
+2022-11-29 05:37:30;INFO;----------------------------------------------------------------------
+2022-11-29 05:37:31;INFO;
+ <Epoch>: 19 -- Start training 
+2022-11-29 05:37:44;INFO;Train | Epoch 19 | 6/32 | 0.5 it/sec | Gen_loss 0.12241 | Disc_loss 0.47523
+2022-11-29 05:37:53;INFO;Train | Epoch 19 | 12/32 | 0.6 it/sec | Gen_loss 0.09765 | Disc_loss 0.39328
+2022-11-29 05:38:01;INFO;Train | Epoch 19 | 18/32 | 0.6 it/sec | Gen_loss 0.09463 | Disc_loss 0.34385
+2022-11-29 05:38:10;INFO;Train | Epoch 19 | 24/32 | 0.6 it/sec | Gen_loss 0.12432 | Disc_loss 0.48258
+2022-11-29 05:38:18;INFO;Train | Epoch 19 | 30/32 | 0.7 it/sec | Gen_loss 0.10794 | Disc_loss 0.42665
+2022-11-29 05:38:21;INFO;----------------------------------------------------------------------
+2022-11-29 05:38:21;INFO;[1m     Epoch 19 - Overall Summary Training | Generator loss: 0.1113401057664305, Discriminator loss: 0.449178003706038[0m
+2022-11-29 05:38:30;INFO;[1m             - Overall Summary Validation | Generator loss: 0.0649374034255743, Discriminator loss: 0.27153655886650085, Score_valid: 2.8060811161994934[0m
+2022-11-29 05:38:30;INFO;----------------------------------------------------------------------
+2022-11-29 05:38:30;INFO;
+ <Epoch>: 20 -- Start training 
+2022-11-29 05:38:44;INFO;Train | Epoch 20 | 6/32 | 0.5 it/sec | Gen_loss 0.12075 | Disc_loss 0.47905
+2022-11-29 05:38:52;INFO;Train | Epoch 20 | 12/32 | 0.6 it/sec | Gen_loss 0.10016 | Disc_loss 0.37299
+2022-11-29 05:39:01;INFO;Train | Epoch 20 | 18/32 | 0.6 it/sec | Gen_loss 0.09537 | Disc_loss 0.34591
+2022-11-29 05:39:09;INFO;Train | Epoch 20 | 24/32 | 0.6 it/sec | Gen_loss 0.11731 | Disc_loss 0.50618
+2022-11-29 05:39:18;INFO;Train | Epoch 20 | 30/32 | 0.7 it/sec | Gen_loss 0.11751 | Disc_loss 0.46435
+2022-11-29 05:39:20;INFO;----------------------------------------------------------------------
+2022-11-29 05:39:20;INFO;[1m     Epoch 20 - Overall Summary Training | Generator loss: 0.11153877037577331, Discriminator loss: 0.44706707354635[0m
+2022-11-29 05:39:29;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06475284975022078, Discriminator loss: 0.25013116747140884, Score_valid: 2.881631016731262[0m
+2022-11-29 05:39:29;INFO;----------------------------------------------------------------------
+2022-11-29 05:41:19;INFO;[1m     Evaluation Summary:  | Epoch 20 | Pesq 2.84827 | Csig 4.32741 | Cbak 3.52643 | Covl 3.65016 | Ssnr 8.82281 | Stoi 0.93179[0m
+2022-11-29 05:41:19;INFO;
+ <Epoch>: 21 -- Start training 
+2022-11-29 05:41:33;INFO;Train | Epoch 21 | 6/32 | 0.5 it/sec | Gen_loss 0.11685 | Disc_loss 0.47965
+2022-11-29 05:41:42;INFO;Train | Epoch 21 | 12/32 | 0.6 it/sec | Gen_loss 0.10201 | Disc_loss 0.38956
+2022-11-29 05:41:50;INFO;Train | Epoch 21 | 18/32 | 0.6 it/sec | Gen_loss 0.09650 | Disc_loss 0.35842
+2022-11-29 05:41:59;INFO;Train | Epoch 21 | 24/32 | 0.6 it/sec | Gen_loss 0.11745 | Disc_loss 0.47290
+2022-11-29 05:42:07;INFO;Train | Epoch 21 | 30/32 | 0.7 it/sec | Gen_loss 0.10917 | Disc_loss 0.43400
+2022-11-29 05:42:10;INFO;----------------------------------------------------------------------
+2022-11-29 05:42:10;INFO;[1m     Epoch 21 - Overall Summary Training | Generator loss: 0.10971979051828384, Discriminator loss: 0.4379842886701226[0m
+2022-11-29 05:42:19;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06466342508792877, Discriminator loss: 0.27448511496186256, Score_valid: 2.7859500646591187[0m
+2022-11-29 05:42:19;INFO;----------------------------------------------------------------------
+2022-11-29 05:42:19;INFO;
+ <Epoch>: 22 -- Start training 
+2022-11-29 05:42:33;INFO;Train | Epoch 22 | 6/32 | 0.5 it/sec | Gen_loss 0.11431 | Disc_loss 0.46573
+2022-11-29 05:42:41;INFO;Train | Epoch 22 | 12/32 | 0.6 it/sec | Gen_loss 0.09704 | Disc_loss 0.35177
+2022-11-29 05:42:50;INFO;Train | Epoch 22 | 18/32 | 0.6 it/sec | Gen_loss 0.09260 | Disc_loss 0.34991
+2022-11-29 05:42:58;INFO;Train | Epoch 22 | 24/32 | 0.7 it/sec | Gen_loss 0.12243 | Disc_loss 0.47859
+2022-11-29 05:43:06;INFO;Train | Epoch 22 | 30/32 | 0.7 it/sec | Gen_loss 0.10650 | Disc_loss 0.45077
+2022-11-29 05:43:09;INFO;----------------------------------------------------------------------
+2022-11-29 05:43:09;INFO;[1m     Epoch 22 - Overall Summary Training | Generator loss: 0.1079370561055839, Discriminator loss: 0.4309491878375411[0m
+2022-11-29 05:43:18;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06722856871783733, Discriminator loss: 0.3014373928308487, Score_valid: 2.714663326740265[0m
+2022-11-29 05:43:18;INFO;----------------------------------------------------------------------
+2022-11-29 05:43:18;INFO;
+ <Epoch>: 23 -- Start training 
+2022-11-29 05:43:32;INFO;Train | Epoch 23 | 6/32 | 0.5 it/sec | Gen_loss 0.12148 | Disc_loss 0.47610
+2022-11-29 05:43:40;INFO;Train | Epoch 23 | 12/32 | 0.6 it/sec | Gen_loss 0.10263 | Disc_loss 0.38229
+2022-11-29 05:43:49;INFO;Train | Epoch 23 | 18/32 | 0.6 it/sec | Gen_loss 0.09419 | Disc_loss 0.34848
+2022-11-29 05:43:57;INFO;Train | Epoch 23 | 24/32 | 0.6 it/sec | Gen_loss 0.11555 | Disc_loss 0.45645
+2022-11-29 05:44:06;INFO;Train | Epoch 23 | 30/32 | 0.7 it/sec | Gen_loss 0.10447 | Disc_loss 0.43019
+PESQ:  [ 3.37580109  3.4447844   1.96344876 -1.        ]
+2022-11-29 05:44:09;INFO;----------------------------------------------------------------------
+2022-11-29 05:44:09;INFO;[1m     Epoch 23 - Overall Summary Training | Generator loss: 0.11002962896600366, Discriminator loss: 0.43727299850434065[0m
+2022-11-29 05:44:17;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06489425711333752, Discriminator loss: 0.27578023821115494, Score_valid: 2.7833539843559265[0m
+2022-11-29 05:44:17;INFO;----------------------------------------------------------------------
+2022-11-29 05:44:18;INFO;
+ <Epoch>: 24 -- Start training 
+2022-11-29 05:44:31;INFO;Train | Epoch 24 | 6/32 | 0.5 it/sec | Gen_loss 0.11563 | Disc_loss 0.45530
+2022-11-29 05:44:40;INFO;Train | Epoch 24 | 12/32 | 0.6 it/sec | Gen_loss 0.09626 | Disc_loss 0.35199
+2022-11-29 05:44:48;INFO;Train | Epoch 24 | 18/32 | 0.6 it/sec | Gen_loss 0.09432 | Disc_loss 0.33654
+2022-11-29 05:44:57;INFO;Train | Epoch 24 | 24/32 | 0.6 it/sec | Gen_loss 0.11200 | Disc_loss 0.44995
+2022-11-29 05:45:05;INFO;Train | Epoch 24 | 30/32 | 0.7 it/sec | Gen_loss 0.10641 | Disc_loss 0.41460
+2022-11-29 05:45:07;INFO;----------------------------------------------------------------------
+2022-11-29 05:45:07;INFO;[1m     Epoch 24 - Overall Summary Training | Generator loss: 0.10686952248215675, Discriminator loss: 0.4243641709908843[0m
+2022-11-29 05:45:16;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06217327527701855, Discriminator loss: 0.26659099757671356, Score_valid: 2.815141201019287[0m
+2022-11-29 05:45:16;INFO;----------------------------------------------------------------------
+2022-11-29 05:45:16;INFO;
+ <Epoch>: 25 -- Start training 
+2022-11-29 05:45:30;INFO;Train | Epoch 25 | 6/32 | 0.5 it/sec | Gen_loss 0.11441 | Disc_loss 0.43706
+2022-11-29 05:45:39;INFO;Train | Epoch 25 | 12/32 | 0.6 it/sec | Gen_loss 0.09476 | Disc_loss 0.35686
+2022-11-29 05:45:47;INFO;Train | Epoch 25 | 18/32 | 0.6 it/sec | Gen_loss 0.09172 | Disc_loss 0.33148
+2022-11-29 05:45:56;INFO;Train | Epoch 25 | 24/32 | 0.6 it/sec | Gen_loss 0.10793 | Disc_loss 0.43352
+2022-11-29 05:46:04;INFO;Train | Epoch 25 | 30/32 | 0.7 it/sec | Gen_loss 0.10099 | Disc_loss 0.41009
+2022-11-29 05:46:07;INFO;----------------------------------------------------------------------
+2022-11-29 05:46:07;INFO;[1m     Epoch 25 - Overall Summary Training | Generator loss: 0.1052356653381139, Discriminator loss: 0.41645911149680614[0m
+2022-11-29 05:46:15;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06216608174145222, Discriminator loss: 0.243680689483881, Score_valid: 2.9013842940330505[0m
+2022-11-29 05:46:15;INFO;----------------------------------------------------------------------
+2022-11-29 05:48:07;INFO;[1m     Evaluation Summary:  | Epoch 25 | Pesq 2.86299 | Csig 4.34989 | Cbak 3.57244 | Covl 3.67163 | Ssnr 9.40867 | Stoi 0.93547[0m
+2022-11-29 05:48:08;INFO;
+ <Epoch>: 26 -- Start training 
+2022-11-29 05:48:22;INFO;Train | Epoch 26 | 6/32 | 0.5 it/sec | Gen_loss 0.11685 | Disc_loss 0.45941
+2022-11-29 05:48:30;INFO;Train | Epoch 26 | 12/32 | 0.6 it/sec | Gen_loss 0.09608 | Disc_loss 0.37533
+2022-11-29 05:48:38;INFO;Train | Epoch 26 | 18/32 | 0.6 it/sec | Gen_loss 0.08967 | Disc_loss 0.33902
+2022-11-29 05:48:47;INFO;Train | Epoch 26 | 24/32 | 0.6 it/sec | Gen_loss 0.11541 | Disc_loss 0.46798
+2022-11-29 05:48:55;INFO;Train | Epoch 26 | 30/32 | 0.7 it/sec | Gen_loss 0.09999 | Disc_loss 0.42158
+2022-11-29 05:48:58;INFO;----------------------------------------------------------------------
+2022-11-29 05:48:58;INFO;[1m     Epoch 26 - Overall Summary Training | Generator loss: 0.10441900370642543, Discriminator loss: 0.41990102268755436[0m
+PESQ:  [-1.          2.50826311  2.57348132  1.64665318]
+2022-11-29 05:49:06;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06230352260172367, Discriminator loss: 0.25136176496744156, Score_valid: 2.8708231449127197[0m
+2022-11-29 05:49:06;INFO;----------------------------------------------------------------------
+2022-11-29 05:49:07;INFO;
+ <Epoch>: 27 -- Start training 
+2022-11-29 05:49:21;INFO;Train | Epoch 27 | 6/32 | 0.5 it/sec | Gen_loss 0.11050 | Disc_loss 0.42465
+2022-11-29 05:49:29;INFO;Train | Epoch 27 | 12/32 | 0.6 it/sec | Gen_loss 0.09479 | Disc_loss 0.35360
+2022-11-29 05:49:38;INFO;Train | Epoch 27 | 18/32 | 0.6 it/sec | Gen_loss 0.09482 | Disc_loss 0.33794
+2022-11-29 05:49:46;INFO;Train | Epoch 27 | 24/32 | 0.6 it/sec | Gen_loss 0.11667 | Disc_loss 0.47832
+2022-11-29 05:49:55;INFO;Train | Epoch 27 | 30/32 | 0.7 it/sec | Gen_loss 0.10233 | Disc_loss 0.40229
+2022-11-29 05:49:57;INFO;----------------------------------------------------------------------
+2022-11-29 05:49:57;INFO;[1m     Epoch 27 - Overall Summary Training | Generator loss: 0.10436737607233226, Discriminator loss: 0.4132944894954562[0m
+2022-11-29 05:50:06;INFO;[1m             - Overall Summary Validation | Generator loss: 0.0658060796558857, Discriminator loss: 0.3018239289522171, Score_valid: 2.7161077857017517[0m
+2022-11-29 05:50:06;INFO;----------------------------------------------------------------------
+2022-11-29 05:50:06;INFO;
+ <Epoch>: 28 -- Start training 
+2022-11-29 05:50:20;INFO;Train | Epoch 28 | 6/32 | 0.5 it/sec | Gen_loss 0.11279 | Disc_loss 0.43518
+2022-11-29 05:50:29;INFO;Train | Epoch 28 | 12/32 | 0.6 it/sec | Gen_loss 0.09296 | Disc_loss 0.35621
+2022-11-29 05:50:37;INFO;Train | Epoch 28 | 18/32 | 0.6 it/sec | Gen_loss 0.09244 | Disc_loss 0.32167
+2022-11-29 05:50:46;INFO;Train | Epoch 28 | 24/32 | 0.6 it/sec | Gen_loss 0.10963 | Disc_loss 0.45206
+2022-11-29 05:50:54;INFO;Train | Epoch 28 | 30/32 | 0.7 it/sec | Gen_loss 0.10126 | Disc_loss 0.40833
+2022-11-29 05:50:57;INFO;----------------------------------------------------------------------
+2022-11-29 05:50:57;INFO;[1m     Epoch 28 - Overall Summary Training | Generator loss: 0.10431504435837269, Discriminator loss: 0.41592106129974127[0m
+2022-11-29 05:51:05;INFO;[1m             - Overall Summary Validation | Generator loss: 0.0613477798178792, Discriminator loss: 0.269243735820055, Score_valid: 2.8069748282432556[0m
+2022-11-29 05:51:05;INFO;----------------------------------------------------------------------
+2022-11-29 05:51:06;INFO;
+ <Epoch>: 29 -- Start training 
+2022-11-29 05:51:20;INFO;Train | Epoch 29 | 6/32 | 0.5 it/sec | Gen_loss 0.11443 | Disc_loss 0.45877
+2022-11-29 05:51:28;INFO;Train | Epoch 29 | 12/32 | 0.6 it/sec | Gen_loss 0.09612 | Disc_loss 0.35052
+2022-11-29 05:51:36;INFO;Train | Epoch 29 | 18/32 | 0.6 it/sec | Gen_loss 0.08828 | Disc_loss 0.31889
+2022-11-29 05:51:45;INFO;Train | Epoch 29 | 24/32 | 0.6 it/sec | Gen_loss 0.11027 | Disc_loss 0.45511
+2022-11-29 05:51:53;INFO;Train | Epoch 29 | 30/32 | 0.7 it/sec | Gen_loss 0.10453 | Disc_loss 0.42184
+2022-11-29 05:51:56;INFO;----------------------------------------------------------------------
+2022-11-29 05:51:56;INFO;[1m     Epoch 29 - Overall Summary Training | Generator loss: 0.10374907869845629, Discriminator loss: 0.41497134789824486[0m
+2022-11-29 05:52:04;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06077593192458153, Discriminator loss: 0.24117352440953255, Score_valid: 2.907658815383911[0m
+2022-11-29 05:52:04;INFO;----------------------------------------------------------------------
+2022-11-29 05:52:05;INFO;
+ <Epoch>: 30 -- Start training 
+2022-11-29 05:52:18;INFO;Train | Epoch 30 | 6/32 | 0.5 it/sec | Gen_loss 0.11334 | Disc_loss 0.42282
+2022-11-29 05:52:27;INFO;Train | Epoch 30 | 12/32 | 0.6 it/sec | Gen_loss 0.09092 | Disc_loss 0.33676
+2022-11-29 05:52:35;INFO;Train | Epoch 30 | 18/32 | 0.6 it/sec | Gen_loss 0.09164 | Disc_loss 0.31822
+2022-11-29 05:52:44;INFO;Train | Epoch 30 | 24/32 | 0.7 it/sec | Gen_loss 0.10405 | Disc_loss 0.42053
+2022-11-29 05:52:52;INFO;Train | Epoch 30 | 30/32 | 0.7 it/sec | Gen_loss 0.09827 | Disc_loss 0.37426
+2022-11-29 05:52:55;INFO;----------------------------------------------------------------------
+2022-11-29 05:52:55;INFO;[1m     Epoch 30 - Overall Summary Training | Generator loss: 0.1012198522221297, Discriminator loss: 0.4019103180617094[0m
+2022-11-29 05:53:03;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06032116897404194, Discriminator loss: 0.25036491453647614, Score_valid: 2.865431487560272[0m
+2022-11-29 05:53:03;INFO;----------------------------------------------------------------------
+2022-11-29 05:54:56;INFO;[1m     Evaluation Summary:  | Epoch 30 | Pesq 2.83174 | Csig 4.34582 | Cbak 3.57655 | Covl 3.65154 | Ssnr 9.69322 | Stoi 0.93593[0m
+2022-11-29 05:54:56;INFO;
+ <Epoch>: 31 -- Start training 
+2022-11-29 05:55:10;INFO;Train | Epoch 31 | 6/32 | 0.5 it/sec | Gen_loss 0.11129 | Disc_loss 0.44680
+2022-11-29 05:55:19;INFO;Train | Epoch 31 | 12/32 | 0.6 it/sec | Gen_loss 0.08854 | Disc_loss 0.35010
+2022-11-29 05:55:28;INFO;Train | Epoch 31 | 18/32 | 0.6 it/sec | Gen_loss 0.09296 | Disc_loss 0.34422
+2022-11-29 05:55:36;INFO;Train | Epoch 31 | 24/32 | 0.6 it/sec | Gen_loss 0.11053 | Disc_loss 0.43847
+2022-11-29 05:55:45;INFO;Train | Epoch 31 | 30/32 | 0.6 it/sec | Gen_loss 0.09979 | Disc_loss 0.38533
+2022-11-29 05:55:48;INFO;----------------------------------------------------------------------
+2022-11-29 05:55:48;INFO;[1m     Epoch 31 - Overall Summary Training | Generator loss: 0.10238153231330216, Discriminator loss: 0.40520058292895555[0m
+2022-11-29 05:55:56;INFO;[1m             - Overall Summary Validation | Generator loss: 0.059789071790874004, Discriminator loss: 0.25256507843732834, Score_valid: 2.8483211994171143[0m
+2022-11-29 05:55:56;INFO;----------------------------------------------------------------------
+2022-11-29 05:55:57;INFO;
+ <Epoch>: 32 -- Start training 
+2022-11-29 05:56:11;INFO;Train | Epoch 32 | 6/32 | 0.5 it/sec | Gen_loss 0.11532 | Disc_loss 0.44839
+2022-11-29 05:56:19;INFO;Train | Epoch 32 | 12/32 | 0.6 it/sec | Gen_loss 0.08618 | Disc_loss 0.32972
+2022-11-29 05:56:28;INFO;Train | Epoch 32 | 18/32 | 0.6 it/sec | Gen_loss 0.08943 | Disc_loss 0.32127
+2022-11-29 05:56:36;INFO;Train | Epoch 32 | 24/32 | 0.6 it/sec | Gen_loss 0.10359 | Disc_loss 0.39296
+2022-11-29 05:56:45;INFO;Train | Epoch 32 | 30/32 | 0.7 it/sec | Gen_loss 0.10084 | Disc_loss 0.38988
+2022-11-29 05:56:47;INFO;----------------------------------------------------------------------
+2022-11-29 05:56:47;INFO;[1m     Epoch 32 - Overall Summary Training | Generator loss: 0.10084969270974398, Discriminator loss: 0.39753610268235207[0m
+PESQ:  [ 3.01384401  3.57139063  3.43127418 -1.        ]
+2022-11-29 05:56:56;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06033040676265955, Discriminator loss: 0.2537364363670349, Score_valid: 2.85757839679718[0m
+2022-11-29 05:56:56;INFO;----------------------------------------------------------------------
+2022-11-29 05:56:57;INFO;
+ <Epoch>: 33 -- Start training 
+2022-11-29 05:57:10;INFO;Train | Epoch 33 | 6/32 | 0.5 it/sec | Gen_loss 0.10915 | Disc_loss 0.43465
+2022-11-29 05:57:19;INFO;Train | Epoch 33 | 12/32 | 0.6 it/sec | Gen_loss 0.09141 | Disc_loss 0.35050
+2022-11-29 05:57:27;INFO;Train | Epoch 33 | 18/32 | 0.6 it/sec | Gen_loss 0.09032 | Disc_loss 0.32430
+2022-11-29 05:57:36;INFO;Train | Epoch 33 | 24/32 | 0.6 it/sec | Gen_loss 0.10845 | Disc_loss 0.43111
+2022-11-29 05:57:54;INFO;Train | Epoch 33 | 30/32 | 0.5 it/sec | Gen_loss 0.09958 | Disc_loss 0.40709
+2022-11-29 05:57:56;INFO;----------------------------------------------------------------------
+2022-11-29 05:57:56;INFO;[1m     Epoch 33 - Overall Summary Training | Generator loss: 0.10115434299223125, Discriminator loss: 0.39716472662985325[0m
+2022-11-29 05:58:05;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06094610225409269, Discriminator loss: 0.2669904977083206, Score_valid: 2.809907078742981[0m
+2022-11-29 05:58:05;INFO;----------------------------------------------------------------------
+2022-11-29 05:58:05;INFO;
+ <Epoch>: 34 -- Start training 
+2022-11-29 05:58:19;INFO;Train | Epoch 34 | 6/32 | 0.5 it/sec | Gen_loss 0.11106 | Disc_loss 0.43921
+2022-11-29 05:58:27;INFO;Train | Epoch 34 | 12/32 | 0.6 it/sec | Gen_loss 0.09086 | Disc_loss 0.35063
+2022-11-29 05:58:36;INFO;Train | Epoch 34 | 18/32 | 0.6 it/sec | Gen_loss 0.09096 | Disc_loss 0.32152
+2022-11-29 05:58:44;INFO;Train | Epoch 34 | 24/32 | 0.7 it/sec | Gen_loss 0.10512 | Disc_loss 0.42931
+2022-11-29 05:58:52;INFO;Train | Epoch 34 | 30/32 | 0.7 it/sec | Gen_loss 0.09960 | Disc_loss 0.40124
+2022-11-29 05:58:55;INFO;----------------------------------------------------------------------
+2022-11-29 05:58:55;INFO;[1m     Epoch 34 - Overall Summary Training | Generator loss: 0.09983733389526606, Discriminator loss: 0.3999949172139168[0m
+PESQ:  [ 3.00755382  3.73309064  3.0186429  -1.        ]
+2022-11-29 05:59:04;INFO;[1m             - Overall Summary Validation | Generator loss: 0.059373946860432625, Discriminator loss: 0.2397538684308529, Score_valid: 2.9114851355552673[0m
+2022-11-29 05:59:04;INFO;----------------------------------------------------------------------
+2022-11-29 05:59:04;INFO;
+ <Epoch>: 35 -- Start training 
+2022-11-29 05:59:18;INFO;Train | Epoch 35 | 6/32 | 0.5 it/sec | Gen_loss 0.11084 | Disc_loss 0.42425
+2022-11-29 05:59:26;INFO;Train | Epoch 35 | 12/32 | 0.6 it/sec | Gen_loss 0.09361 | Disc_loss 0.35111
+2022-11-29 05:59:35;INFO;Train | Epoch 35 | 18/32 | 0.6 it/sec | Gen_loss 0.08675 | Disc_loss 0.31420
+2022-11-29 05:59:43;INFO;Train | Epoch 35 | 24/32 | 0.6 it/sec | Gen_loss 0.10555 | Disc_loss 0.39445
+2022-11-29 05:59:52;INFO;Train | Epoch 35 | 30/32 | 0.7 it/sec | Gen_loss 0.09857 | Disc_loss 0.37444
+2022-11-29 05:59:55;INFO;----------------------------------------------------------------------
+2022-11-29 05:59:55;INFO;[1m     Epoch 35 - Overall Summary Training | Generator loss: 0.10007535247132182, Discriminator loss: 0.39798857271671295[0m
+2022-11-29 06:00:03;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05993528850376606, Discriminator loss: 0.25094185024499893, Score_valid: 2.8695091009140015[0m
+2022-11-29 06:00:03;INFO;----------------------------------------------------------------------
+2022-11-29 06:01:54;INFO;[1m     Evaluation Summary:  | Epoch 35 | Pesq 2.83649 | Csig 4.34711 | Cbak 3.58289 | Covl 3.65513 | Ssnr 9.75667 | Stoi 0.93674[0m
+2022-11-29 06:01:55;INFO;
+ <Epoch>: 36 -- Start training 
+2022-11-29 06:02:08;INFO;Train | Epoch 36 | 6/32 | 0.5 it/sec | Gen_loss 0.10882 | Disc_loss 0.42983
+2022-11-29 06:02:16;INFO;Train | Epoch 36 | 12/32 | 0.6 it/sec | Gen_loss 0.09087 | Disc_loss 0.33157
+2022-11-29 06:02:25;INFO;Train | Epoch 36 | 18/32 | 0.6 it/sec | Gen_loss 0.08716 | Disc_loss 0.30293
+2022-11-29 06:02:33;INFO;Train | Epoch 36 | 24/32 | 0.7 it/sec | Gen_loss 0.10536 | Disc_loss 0.41418
+2022-11-29 06:02:42;INFO;Train | Epoch 36 | 30/32 | 0.7 it/sec | Gen_loss 0.09681 | Disc_loss 0.38219
+PESQ:  [ 1.50040722  2.50883222  3.41680956 -1.        ]
+2022-11-29 06:02:44;INFO;----------------------------------------------------------------------
+2022-11-29 06:02:44;INFO;[1m     Epoch 36 - Overall Summary Training | Generator loss: 0.09867664589546621, Discriminator loss: 0.3924391623586416[0m
+2022-11-29 06:02:53;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06022515520453453, Discriminator loss: 0.2630715034902096, Score_valid: 2.821301221847534[0m
+2022-11-29 06:02:53;INFO;----------------------------------------------------------------------
+2022-11-29 06:02:53;INFO;
+ <Epoch>: 37 -- Start training 
+2022-11-29 06:03:07;INFO;Train | Epoch 37 | 6/32 | 0.5 it/sec | Gen_loss 0.11038 | Disc_loss 0.44326
+2022-11-29 06:03:15;INFO;Train | Epoch 37 | 12/32 | 0.6 it/sec | Gen_loss 0.08942 | Disc_loss 0.33620
+2022-11-29 06:03:24;INFO;Train | Epoch 37 | 18/32 | 0.6 it/sec | Gen_loss 0.08855 | Disc_loss 0.31807
+2022-11-29 06:03:32;INFO;Train | Epoch 37 | 24/32 | 0.7 it/sec | Gen_loss 0.10398 | Disc_loss 0.39622
+2022-11-29 06:03:41;INFO;Train | Epoch 37 | 30/32 | 0.7 it/sec | Gen_loss 0.09903 | Disc_loss 0.37776
+PESQ:  [ 3.52357578  3.75570083  2.63296556 -1.        ]
+2022-11-29 06:03:43;INFO;----------------------------------------------------------------------
+2022-11-29 06:03:43;INFO;[1m     Epoch 37 - Overall Summary Training | Generator loss: 0.09999878262169659, Discriminator loss: 0.39391560666263103[0m
+2022-11-29 06:03:52;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05935878399759531, Discriminator loss: 0.25400082394480705, Score_valid: 2.8437005281448364[0m
+2022-11-29 06:03:52;INFO;----------------------------------------------------------------------
+2022-11-29 06:03:53;INFO;
+ <Epoch>: 38 -- Start training 
+2022-11-29 06:04:06;INFO;Train | Epoch 38 | 6/32 | 0.5 it/sec | Gen_loss 0.11002 | Disc_loss 0.45471
+2022-11-29 06:04:14;INFO;Train | Epoch 38 | 12/32 | 0.6 it/sec | Gen_loss 0.09039 | Disc_loss 0.34585
+2022-11-29 06:04:23;INFO;Train | Epoch 38 | 18/32 | 0.6 it/sec | Gen_loss 0.08989 | Disc_loss 0.30410
+2022-11-29 06:04:31;INFO;Train | Epoch 38 | 24/32 | 0.7 it/sec | Gen_loss 0.10845 | Disc_loss 0.42082
+2022-11-29 06:04:39;INFO;Train | Epoch 38 | 30/32 | 0.7 it/sec | Gen_loss 0.09860 | Disc_loss 0.39513
+2022-11-29 06:04:42;INFO;----------------------------------------------------------------------
+2022-11-29 06:04:42;INFO;[1m     Epoch 38 - Overall Summary Training | Generator loss: 0.09992311778478324, Discriminator loss: 0.3945737862959504[0m
+2022-11-29 06:04:51;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05958855524659157, Discriminator loss: 0.25206439569592476, Score_valid: 2.8616374135017395[0m
+2022-11-29 06:04:51;INFO;----------------------------------------------------------------------
+2022-11-29 06:04:51;INFO;
+ <Epoch>: 39 -- Start training 
+2022-11-29 06:05:05;INFO;Train | Epoch 39 | 6/32 | 0.5 it/sec | Gen_loss 0.10904 | Disc_loss 0.41987
+2022-11-29 06:05:13;INFO;Train | Epoch 39 | 12/32 | 0.6 it/sec | Gen_loss 0.08861 | Disc_loss 0.31808
+2022-11-29 06:05:22;INFO;Train | Epoch 39 | 18/32 | 0.6 it/sec | Gen_loss 0.09042 | Disc_loss 0.30467
+2022-11-29 06:05:30;INFO;Train | Epoch 39 | 24/32 | 0.6 it/sec | Gen_loss 0.10766 | Disc_loss 0.41741
+2022-11-29 06:05:39;INFO;Train | Epoch 39 | 30/32 | 0.7 it/sec | Gen_loss 0.09468 | Disc_loss 0.38296
+2022-11-29 06:05:42;INFO;----------------------------------------------------------------------
+2022-11-29 06:05:42;INFO;[1m     Epoch 39 - Overall Summary Training | Generator loss: 0.09946199576370418, Discriminator loss: 0.3887876644730568[0m
+2022-11-29 06:05:50;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06007704325020313, Discriminator loss: 0.2551915943622589, Score_valid: 2.843791425228119[0m
+2022-11-29 06:05:50;INFO;----------------------------------------------------------------------
+2022-11-29 06:05:51;INFO;
+ <Epoch>: 40 -- Start training 
+2022-11-29 06:06:04;INFO;Train | Epoch 40 | 6/32 | 0.5 it/sec | Gen_loss 0.10644 | Disc_loss 0.40906
+2022-11-29 06:06:13;INFO;Train | Epoch 40 | 12/32 | 0.6 it/sec | Gen_loss 0.08890 | Disc_loss 0.33448
+2022-11-29 06:06:21;INFO;Train | Epoch 40 | 18/32 | 0.6 it/sec | Gen_loss 0.08552 | Disc_loss 0.29652
+2022-11-29 06:06:29;INFO;Train | Epoch 40 | 24/32 | 0.7 it/sec | Gen_loss 0.10460 | Disc_loss 0.43489
+2022-11-29 06:06:38;INFO;Train | Epoch 40 | 30/32 | 0.7 it/sec | Gen_loss 0.09243 | Disc_loss 0.37145
+2022-11-29 06:06:40;INFO;----------------------------------------------------------------------
+2022-11-29 06:06:40;INFO;[1m     Epoch 40 - Overall Summary Training | Generator loss: 0.09886656561866403, Discriminator loss: 0.390514581464231[0m
+2022-11-29 06:06:49;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05838383547961712, Discriminator loss: 0.24659621715545654, Score_valid: 2.876220703125[0m
+2022-11-29 06:06:49;INFO;----------------------------------------------------------------------
+2022-11-29 06:08:41;INFO;[1m     Evaluation Summary:  | Epoch 40 | Pesq 2.84290 | Csig 4.34784 | Cbak 3.60755 | Covl 3.65865 | Ssnr 10.09000 | Stoi 0.93772[0m
+2022-11-29 06:08:41;INFO;
+ <Epoch>: 41 -- Start training 
+2022-11-29 06:08:55;INFO;Train | Epoch 41 | 6/32 | 0.5 it/sec | Gen_loss 0.11004 | Disc_loss 0.43462
+2022-11-29 06:09:03;INFO;Train | Epoch 41 | 12/32 | 0.6 it/sec | Gen_loss 0.08782 | Disc_loss 0.33477
+2022-11-29 06:09:12;INFO;Train | Epoch 41 | 18/32 | 0.6 it/sec | Gen_loss 0.08628 | Disc_loss 0.29717
+2022-11-29 06:09:20;INFO;Train | Epoch 41 | 24/32 | 0.7 it/sec | Gen_loss 0.10367 | Disc_loss 0.40973
+2022-11-29 06:09:28;INFO;Train | Epoch 41 | 30/32 | 0.7 it/sec | Gen_loss 0.09801 | Disc_loss 0.37768
+2022-11-29 06:09:31;INFO;----------------------------------------------------------------------
+2022-11-29 06:09:31;INFO;[1m     Epoch 41 - Overall Summary Training | Generator loss: 0.09895011642947793, Discriminator loss: 0.3888093614950776[0m
+2022-11-29 06:09:39;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05941879469901323, Discriminator loss: 0.24410447850823402, Score_valid: 2.883607029914856[0m
+2022-11-29 06:09:39;INFO;----------------------------------------------------------------------
+2022-11-29 06:09:40;INFO;
+ <Epoch>: 42 -- Start training 
+2022-11-29 06:09:53;INFO;Train | Epoch 42 | 6/32 | 0.5 it/sec | Gen_loss 0.10667 | Disc_loss 0.43537
+2022-11-29 06:10:02;INFO;Train | Epoch 42 | 12/32 | 0.6 it/sec | Gen_loss 0.08814 | Disc_loss 0.32762
+2022-11-29 06:10:10;INFO;Train | Epoch 42 | 18/32 | 0.6 it/sec | Gen_loss 0.08520 | Disc_loss 0.28230
+2022-11-29 06:10:19;INFO;Train | Epoch 42 | 24/32 | 0.7 it/sec | Gen_loss 0.10950 | Disc_loss 0.42023
+2022-11-29 06:10:27;INFO;Train | Epoch 42 | 30/32 | 0.7 it/sec | Gen_loss 0.09658 | Disc_loss 0.38299
+2022-11-29 06:10:30;INFO;----------------------------------------------------------------------
+2022-11-29 06:10:30;INFO;[1m     Epoch 42 - Overall Summary Training | Generator loss: 0.09848799020983279, Discriminator loss: 0.38437040336430073[0m
+2022-11-29 06:10:38;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05830321367830038, Discriminator loss: 0.24328359588980675, Score_valid: 2.896714508533478[0m
+2022-11-29 06:10:38;INFO;----------------------------------------------------------------------
+2022-11-29 06:10:39;INFO;
+ <Epoch>: 43 -- Start training 
+2022-11-29 06:10:53;INFO;Train | Epoch 43 | 6/32 | 0.5 it/sec | Gen_loss 0.10796 | Disc_loss 0.41706
+2022-11-29 06:11:01;INFO;Train | Epoch 43 | 12/32 | 0.6 it/sec | Gen_loss 0.08723 | Disc_loss 0.29789
+2022-11-29 06:11:09;INFO;Train | Epoch 43 | 18/32 | 0.6 it/sec | Gen_loss 0.08783 | Disc_loss 0.31722
+2022-11-29 06:11:18;INFO;Train | Epoch 43 | 24/32 | 0.7 it/sec | Gen_loss 0.10815 | Disc_loss 0.41942
+2022-11-29 06:11:26;INFO;Train | Epoch 43 | 30/32 | 0.7 it/sec | Gen_loss 0.09788 | Disc_loss 0.37192
+2022-11-29 06:11:29;INFO;----------------------------------------------------------------------
+2022-11-29 06:11:29;INFO;[1m     Epoch 43 - Overall Summary Training | Generator loss: 0.0986782053951174, Discriminator loss: 0.38754282612353563[0m
+2022-11-29 06:11:37;INFO;[1m             - Overall Summary Validation | Generator loss: 0.060288380831480026, Discriminator loss: 0.25447316467761993, Score_valid: 2.849562644958496[0m
+2022-11-29 06:11:37;INFO;----------------------------------------------------------------------
+2022-11-29 06:11:38;INFO;
+ <Epoch>: 44 -- Start training 
+2022-11-29 06:11:51;INFO;Train | Epoch 44 | 6/32 | 0.5 it/sec | Gen_loss 0.11022 | Disc_loss 0.42798
+2022-11-29 06:12:00;INFO;Train | Epoch 44 | 12/32 | 0.6 it/sec | Gen_loss 0.09255 | Disc_loss 0.35593
+2022-11-29 06:12:08;INFO;Train | Epoch 44 | 18/32 | 0.6 it/sec | Gen_loss 0.08748 | Disc_loss 0.30044
+2022-11-29 06:12:17;INFO;Train | Epoch 44 | 24/32 | 0.6 it/sec | Gen_loss 0.10313 | Disc_loss 0.39002
+2022-11-29 06:12:25;INFO;Train | Epoch 44 | 30/32 | 0.7 it/sec | Gen_loss 0.09745 | Disc_loss 0.37174
+2022-11-29 06:12:28;INFO;----------------------------------------------------------------------
+2022-11-29 06:12:28;INFO;[1m     Epoch 44 - Overall Summary Training | Generator loss: 0.09968131617642939, Discriminator loss: 0.3922380208969116[0m
+2022-11-29 06:12:36;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05885110981762409, Discriminator loss: 0.24785400927066803, Score_valid: 2.8758620023727417[0m
+2022-11-29 06:12:36;INFO;----------------------------------------------------------------------
+2022-11-29 06:12:37;INFO;
+ <Epoch>: 45 -- Start training 
+2022-11-29 06:12:50;INFO;Train | Epoch 45 | 6/32 | 0.5 it/sec | Gen_loss 0.10691 | Disc_loss 0.44425
+2022-11-29 06:12:59;INFO;Train | Epoch 45 | 12/32 | 0.6 it/sec | Gen_loss 0.08717 | Disc_loss 0.33319
+2022-11-29 06:13:08;INFO;Train | Epoch 45 | 18/32 | 0.6 it/sec | Gen_loss 0.08664 | Disc_loss 0.28917
+2022-11-29 06:13:16;INFO;Train | Epoch 45 | 24/32 | 0.6 it/sec | Gen_loss 0.10329 | Disc_loss 0.40965
+2022-11-29 06:13:24;INFO;Train | Epoch 45 | 30/32 | 0.7 it/sec | Gen_loss 0.09562 | Disc_loss 0.37686
+2022-11-29 06:13:27;INFO;----------------------------------------------------------------------
+2022-11-29 06:13:27;INFO;[1m     Epoch 45 - Overall Summary Training | Generator loss: 0.09720915253274143, Discriminator loss: 0.384252343326807[0m
+2022-11-29 06:13:36;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05821761954575777, Discriminator loss: 0.235857255756855, Score_valid: 2.9220967292785645[0m
+2022-11-29 06:13:36;INFO;----------------------------------------------------------------------
+2022-11-29 06:15:26;INFO;[1m     Evaluation Summary:  | Epoch 45 | Pesq 2.89388 | Csig 4.39245 | Cbak 3.63164 | Covl 3.70776 | Ssnr 10.08485 | Stoi 0.93775[0m
+2022-11-29 06:15:27;INFO;
+ <Epoch>: 46 -- Start training 
+2022-11-29 06:15:41;INFO;Train | Epoch 46 | 6/32 | 0.5 it/sec | Gen_loss 0.10618 | Disc_loss 0.42976
+2022-11-29 06:15:49;INFO;Train | Epoch 46 | 12/32 | 0.6 it/sec | Gen_loss 0.08610 | Disc_loss 0.30726
+2022-11-29 06:15:58;INFO;Train | Epoch 46 | 18/32 | 0.6 it/sec | Gen_loss 0.08702 | Disc_loss 0.31130
+2022-11-29 06:16:06;INFO;Train | Epoch 46 | 24/32 | 0.7 it/sec | Gen_loss 0.10598 | Disc_loss 0.41360
+2022-11-29 06:16:14;INFO;Train | Epoch 46 | 30/32 | 0.7 it/sec | Gen_loss 0.09526 | Disc_loss 0.37675
+2022-11-29 06:16:17;INFO;----------------------------------------------------------------------
+2022-11-29 06:16:17;INFO;[1m     Epoch 46 - Overall Summary Training | Generator loss: 0.09696429735049605, Discriminator loss: 0.37993722036480904[0m
+2022-11-29 06:16:26;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05848501995205879, Discriminator loss: 0.2386738881468773, Score_valid: 2.908328056335449[0m
+2022-11-29 06:16:26;INFO;----------------------------------------------------------------------
+2022-11-29 06:16:26;INFO;
+ <Epoch>: 47 -- Start training 
+2022-11-29 06:16:40;INFO;Train | Epoch 47 | 6/32 | 0.5 it/sec | Gen_loss 0.10718 | Disc_loss 0.43839
+2022-11-29 06:16:48;INFO;Train | Epoch 47 | 12/32 | 0.6 it/sec | Gen_loss 0.08791 | Disc_loss 0.32349
+2022-11-29 06:16:56;INFO;Train | Epoch 47 | 18/32 | 0.6 it/sec | Gen_loss 0.08553 | Disc_loss 0.33359
+2022-11-29 06:17:05;INFO;Train | Epoch 47 | 24/32 | 0.7 it/sec | Gen_loss 0.10300 | Disc_loss 0.39298
+2022-11-29 06:17:13;INFO;Train | Epoch 47 | 30/32 | 0.7 it/sec | Gen_loss 0.09133 | Disc_loss 0.36727
+2022-11-29 06:17:16;INFO;----------------------------------------------------------------------
+2022-11-29 06:17:16;INFO;[1m     Epoch 47 - Overall Summary Training | Generator loss: 0.09707429865375161, Discriminator loss: 0.37858448177576065[0m
+2022-11-29 06:17:24;INFO;[1m             - Overall Summary Validation | Generator loss: 0.058199044317007065, Discriminator loss: 0.25188128650188446, Score_valid: 2.8579755425453186[0m
+2022-11-29 06:17:24;INFO;----------------------------------------------------------------------
+2022-11-29 06:17:25;INFO;
+ <Epoch>: 48 -- Start training 
+2022-11-29 06:17:38;INFO;Train | Epoch 48 | 6/32 | 0.5 it/sec | Gen_loss 0.10920 | Disc_loss 0.42001
+2022-11-29 06:17:47;INFO;Train | Epoch 48 | 12/32 | 0.6 it/sec | Gen_loss 0.08898 | Disc_loss 0.32142
+2022-11-29 06:17:55;INFO;Train | Epoch 48 | 18/32 | 0.6 it/sec | Gen_loss 0.08415 | Disc_loss 0.31400
+2022-11-29 06:18:04;INFO;Train | Epoch 48 | 24/32 | 0.6 it/sec | Gen_loss 0.10639 | Disc_loss 0.42658
+2022-11-29 06:18:12;INFO;Train | Epoch 48 | 30/32 | 0.7 it/sec | Gen_loss 0.09731 | Disc_loss 0.39620
+2022-11-29 06:18:15;INFO;----------------------------------------------------------------------
+2022-11-29 06:18:15;INFO;[1m     Epoch 48 - Overall Summary Training | Generator loss: 0.0971548450179398, Discriminator loss: 0.38002744410187006[0m
+2022-11-29 06:18:23;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06051583029329777, Discriminator loss: 0.25787925720214844, Score_valid: 2.8318886756896973[0m
+2022-11-29 06:18:23;INFO;----------------------------------------------------------------------
+2022-11-29 06:18:23;INFO;
+ <Epoch>: 49 -- Start training 
+2022-11-29 06:18:37;INFO;Train | Epoch 49 | 6/32 | 0.5 it/sec | Gen_loss 0.10383 | Disc_loss 0.38933
+2022-11-29 06:18:45;INFO;Train | Epoch 49 | 12/32 | 0.6 it/sec | Gen_loss 0.08520 | Disc_loss 0.30067
+2022-11-29 06:18:54;INFO;Train | Epoch 49 | 18/32 | 0.6 it/sec | Gen_loss 0.09177 | Disc_loss 0.31328
+2022-11-29 06:19:02;INFO;Train | Epoch 49 | 24/32 | 0.7 it/sec | Gen_loss 0.10675 | Disc_loss 0.41032
+2022-11-29 06:19:10;INFO;Train | Epoch 49 | 30/32 | 0.7 it/sec | Gen_loss 0.09714 | Disc_loss 0.35704
+2022-11-29 06:19:13;INFO;----------------------------------------------------------------------
+2022-11-29 06:19:13;INFO;[1m     Epoch 49 - Overall Summary Training | Generator loss: 0.09598397579975426, Discriminator loss: 0.3755689598619938[0m
+2022-11-29 06:19:21;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05838067922741175, Discriminator loss: 0.23675744235515594, Score_valid: 2.9183993339538574[0m
+2022-11-29 06:19:21;INFO;----------------------------------------------------------------------
+2022-11-29 06:19:22;INFO;
+ <Epoch>: 50 -- Start training 
+2022-11-29 06:19:36;INFO;Train | Epoch 50 | 6/32 | 0.5 it/sec | Gen_loss 0.10871 | Disc_loss 0.42151
+2022-11-29 06:19:44;INFO;Train | Epoch 50 | 12/32 | 0.6 it/sec | Gen_loss 0.09046 | Disc_loss 0.33795
+2022-11-29 06:19:53;INFO;Train | Epoch 50 | 18/32 | 0.6 it/sec | Gen_loss 0.08424 | Disc_loss 0.30191
+2022-11-29 06:20:01;INFO;Train | Epoch 50 | 24/32 | 0.7 it/sec | Gen_loss 0.10554 | Disc_loss 0.43457
+2022-11-29 06:20:09;INFO;Train | Epoch 50 | 30/32 | 0.7 it/sec | Gen_loss 0.09672 | Disc_loss 0.35999
+2022-11-29 06:20:12;INFO;----------------------------------------------------------------------
+2022-11-29 06:20:12;INFO;[1m     Epoch 50 - Overall Summary Training | Generator loss: 0.09626878495328128, Discriminator loss: 0.37780395429581404[0m
+2022-11-29 06:20:21;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05999174900352955, Discriminator loss: 0.24504157900810242, Score_valid: 2.8820844292640686[0m
+2022-11-29 06:20:21;INFO;----------------------------------------------------------------------
+2022-11-29 06:22:11;INFO;[1m     Evaluation Summary:  | Epoch 50 | Pesq 2.84253 | Csig 4.36573 | Cbak 3.59759 | Covl 3.66756 | Ssnr 9.93030 | Stoi 0.93883[0m
+2022-11-29 06:22:12;INFO;
+ <Epoch>: 51 -- Start training 
+2022-11-29 06:22:26;INFO;Train | Epoch 51 | 6/32 | 0.5 it/sec | Gen_loss 0.10554 | Disc_loss 0.41752
+2022-11-29 06:22:35;INFO;Train | Epoch 51 | 12/32 | 0.6 it/sec | Gen_loss 0.08710 | Disc_loss 0.30913
+2022-11-29 06:22:43;INFO;Train | Epoch 51 | 18/32 | 0.6 it/sec | Gen_loss 0.08751 | Disc_loss 0.29796
+2022-11-29 06:22:51;INFO;Train | Epoch 51 | 24/32 | 0.6 it/sec | Gen_loss 0.10113 | Disc_loss 0.38360
+2022-11-29 06:23:00;INFO;Train | Epoch 51 | 30/32 | 0.7 it/sec | Gen_loss 0.09428 | Disc_loss 0.37118
+2022-11-29 06:23:03;INFO;----------------------------------------------------------------------
+2022-11-29 06:23:03;INFO;[1m     Epoch 51 - Overall Summary Training | Generator loss: 0.09659311058931053, Discriminator loss: 0.37663821317255497[0m
+2022-11-29 06:23:11;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05847907345741987, Discriminator loss: 0.2326805591583252, Score_valid: 2.925553560256958[0m
+2022-11-29 06:23:11;INFO;----------------------------------------------------------------------
+2022-11-29 06:23:12;INFO;
+ <Epoch>: 52 -- Start training 
+2022-11-29 06:23:25;INFO;Train | Epoch 52 | 6/32 | 0.5 it/sec | Gen_loss 0.10632 | Disc_loss 0.42531
+2022-11-29 06:23:34;INFO;Train | Epoch 52 | 12/32 | 0.6 it/sec | Gen_loss 0.09056 | Disc_loss 0.33230
+2022-11-29 06:23:42;INFO;Train | Epoch 52 | 18/32 | 0.6 it/sec | Gen_loss 0.08487 | Disc_loss 0.29249
+2022-11-29 06:23:50;INFO;Train | Epoch 52 | 24/32 | 0.7 it/sec | Gen_loss 0.10437 | Disc_loss 0.40419
+2022-11-29 06:23:59;INFO;Train | Epoch 52 | 30/32 | 0.7 it/sec | Gen_loss 0.09822 | Disc_loss 0.38194
+2022-11-29 06:24:01;INFO;----------------------------------------------------------------------
+2022-11-29 06:24:01;INFO;[1m     Epoch 52 - Overall Summary Training | Generator loss: 0.09685343853197992, Discriminator loss: 0.3775501614436507[0m
+PESQ:  [ 1.59804904  1.79386306  2.96182585 -1.        ]
+2022-11-29 06:24:10;INFO;[1m             - Overall Summary Validation | Generator loss: 0.06093290075659752, Discriminator loss: 0.26056385040283203, Score_valid: 2.8350521326065063[0m
+2022-11-29 06:24:10;INFO;----------------------------------------------------------------------
+2022-11-29 06:24:10;INFO;
+ <Epoch>: 53 -- Start training 
+2022-11-29 06:24:24;INFO;Train | Epoch 53 | 6/32 | 0.5 it/sec | Gen_loss 0.10226 | Disc_loss 0.39642
+2022-11-29 06:24:33;INFO;Train | Epoch 53 | 12/32 | 0.6 it/sec | Gen_loss 0.08710 | Disc_loss 0.31927
+2022-11-29 06:24:41;INFO;Train | Epoch 53 | 18/32 | 0.6 it/sec | Gen_loss 0.08538 | Disc_loss 0.28289
+2022-11-29 06:24:50;INFO;Train | Epoch 53 | 24/32 | 0.6 it/sec | Gen_loss 0.10080 | Disc_loss 0.40389
+2022-11-29 06:24:58;INFO;Train | Epoch 53 | 30/32 | 0.7 it/sec | Gen_loss 0.09650 | Disc_loss 0.37004
+PESQ:  [ 3.0871954   3.85629034  2.37943292 -1.        ]
+2022-11-29 06:25:00;INFO;----------------------------------------------------------------------
+2022-11-29 06:25:00;INFO;[1m     Epoch 53 - Overall Summary Training | Generator loss: 0.09715687483549118, Discriminator loss: 0.37544131744652987[0m
+2022-11-29 06:25:09;INFO;[1m             - Overall Summary Validation | Generator loss: 0.057446698658168316, Discriminator loss: 0.23965651541948318, Score_valid: 2.896522641181946[0m
+2022-11-29 06:25:09;INFO;----------------------------------------------------------------------
+2022-11-29 06:25:10;INFO;
+ <Epoch>: 54 -- Start training 
+2022-11-29 06:25:23;INFO;Train | Epoch 54 | 6/32 | 0.5 it/sec | Gen_loss 0.10230 | Disc_loss 0.39165
+2022-11-29 06:25:31;INFO;Train | Epoch 54 | 12/32 | 0.6 it/sec | Gen_loss 0.08362 | Disc_loss 0.30868
+2022-11-29 06:25:40;INFO;Train | Epoch 54 | 18/32 | 0.6 it/sec | Gen_loss 0.08477 | Disc_loss 0.29491
+2022-11-29 06:25:48;INFO;Train | Epoch 54 | 24/32 | 0.7 it/sec | Gen_loss 0.10529 | Disc_loss 0.40834
+2022-11-29 06:25:57;INFO;Train | Epoch 54 | 30/32 | 0.7 it/sec | Gen_loss 0.09603 | Disc_loss 0.40091
+2022-11-29 06:26:00;INFO;----------------------------------------------------------------------
+2022-11-29 06:26:00;INFO;[1m     Epoch 54 - Overall Summary Training | Generator loss: 0.09539196477271616, Discriminator loss: 0.37072516698390245[0m
+2022-11-29 06:26:08;INFO;[1m             - Overall Summary Validation | Generator loss: 0.058054219000041485, Discriminator loss: 0.23874978721141815, Score_valid: 2.901207447052002[0m
+2022-11-29 06:26:08;INFO;----------------------------------------------------------------------
+2022-11-29 06:26:09;INFO;
+ <Epoch>: 55 -- Start training 
+2022-11-29 06:26:23;INFO;Train | Epoch 55 | 6/32 | 0.5 it/sec | Gen_loss 0.10590 | Disc_loss 0.41708
+2022-11-29 06:26:31;INFO;Train | Epoch 55 | 12/32 | 0.6 it/sec | Gen_loss 0.08667 | Disc_loss 0.32660
+2022-11-29 06:26:39;INFO;Train | Epoch 55 | 18/32 | 0.6 it/sec | Gen_loss 0.08506 | Disc_loss 0.28905
+2022-11-29 06:26:48;INFO;Train | Epoch 55 | 24/32 | 0.6 it/sec | Gen_loss 0.10419 | Disc_loss 0.40720
+2022-11-29 06:26:56;INFO;Train | Epoch 55 | 30/32 | 0.7 it/sec | Gen_loss 0.09903 | Disc_loss 0.37296
+2022-11-29 06:26:59;INFO;----------------------------------------------------------------------
+2022-11-29 06:26:59;INFO;[1m     Epoch 55 - Overall Summary Training | Generator loss: 0.09636964346282184, Discriminator loss: 0.3753096451982856[0m
+2022-11-29 06:27:08;INFO;[1m             - Overall Summary Validation | Generator loss: 0.059092460200190544, Discriminator loss: 0.25160570815205574, Score_valid: 2.8558640480041504[0m
+2022-11-29 06:27:08;INFO;----------------------------------------------------------------------
+2022-11-29 06:28:59;INFO;[1m     Evaluation Summary:  | Epoch 55 | Pesq 2.82643 | Csig 4.35634 | Cbak 3.59848 | Covl 3.65476 | Ssnr 10.06084 | Stoi 0.93851[0m
+2022-11-29 06:28:59;INFO;
+ <Epoch>: 56 -- Start training 
+2022-11-29 06:29:13;INFO;Train | Epoch 56 | 6/32 | 0.5 it/sec | Gen_loss 0.10405 | Disc_loss 0.39855
+2022-11-29 06:29:22;INFO;Train | Epoch 56 | 12/32 | 0.6 it/sec | Gen_loss 0.08353 | Disc_loss 0.31787
+2022-11-29 06:29:30;INFO;Train | Epoch 56 | 18/32 | 0.6 it/sec | Gen_loss 0.08730 | Disc_loss 0.29961
+2022-11-29 06:29:38;INFO;Train | Epoch 56 | 24/32 | 0.6 it/sec | Gen_loss 0.10710 | Disc_loss 0.40602
+2022-11-29 06:29:46;INFO;Train | Epoch 56 | 30/32 | 0.7 it/sec | Gen_loss 0.09237 | Disc_loss 0.32563
+PESQ:  [ 2.93628407  2.75544333  3.19125891 -1.        ]
+2022-11-29 06:29:50;INFO;----------------------------------------------------------------------
+2022-11-29 06:29:50;INFO;[1m     Epoch 56 - Overall Summary Training | Generator loss: 0.09569742530584335, Discriminator loss: 0.36851351615041494[0m
+2022-11-29 06:29:58;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05804039817303419, Discriminator loss: 0.2349766157567501, Score_valid: 2.907656729221344[0m
+2022-11-29 06:29:58;INFO;----------------------------------------------------------------------
+2022-11-29 06:29:59;INFO;
+ <Epoch>: 57 -- Start training 
+2022-11-29 06:30:12;INFO;Train | Epoch 57 | 6/32 | 0.5 it/sec | Gen_loss 0.10646 | Disc_loss 0.42294
+2022-11-29 06:30:21;INFO;Train | Epoch 57 | 12/32 | 0.6 it/sec | Gen_loss 0.08530 | Disc_loss 0.32015
+2022-11-29 06:30:29;INFO;Train | Epoch 57 | 18/32 | 0.6 it/sec | Gen_loss 0.08485 | Disc_loss 0.30244
+2022-11-29 06:30:37;INFO;Train | Epoch 57 | 24/32 | 0.7 it/sec | Gen_loss 0.10606 | Disc_loss 0.40060
+2022-11-29 06:30:46;INFO;Train | Epoch 57 | 30/32 | 0.7 it/sec | Gen_loss 0.09504 | Disc_loss 0.35852
+2022-11-29 06:30:48;INFO;----------------------------------------------------------------------
+2022-11-29 06:30:48;INFO;[1m     Epoch 57 - Overall Summary Training | Generator loss: 0.09606219665147364, Discriminator loss: 0.36827488243579865[0m
+PESQ:  [ 1.8679893   3.76621032  1.34121597 -1.        ]
+2022-11-29 06:30:57;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05734809301793575, Discriminator loss: 0.23274802789092064, Score_valid: 2.923700511455536[0m
+2022-11-29 06:30:57;INFO;----------------------------------------------------------------------
+2022-11-29 06:30:57;INFO;
+ <Epoch>: 58 -- Start training 
+2022-11-29 06:31:11;INFO;Train | Epoch 58 | 6/32 | 0.5 it/sec | Gen_loss 0.10114 | Disc_loss 0.40152
+2022-11-29 06:31:19;INFO;Train | Epoch 58 | 12/32 | 0.6 it/sec | Gen_loss 0.08553 | Disc_loss 0.32069
+2022-11-29 06:31:27;INFO;Train | Epoch 58 | 18/32 | 0.6 it/sec | Gen_loss 0.08933 | Disc_loss 0.32241
+2022-11-29 06:31:36;INFO;Train | Epoch 58 | 24/32 | 0.7 it/sec | Gen_loss 0.10676 | Disc_loss 0.40267
+2022-11-29 06:31:44;INFO;Train | Epoch 58 | 30/32 | 0.7 it/sec | Gen_loss 0.09394 | Disc_loss 0.37736
+2022-11-29 06:31:47;INFO;----------------------------------------------------------------------
+2022-11-29 06:31:47;INFO;[1m     Epoch 58 - Overall Summary Training | Generator loss: 0.09579274989664555, Discriminator loss: 0.37284216843545437[0m
+2022-11-29 06:31:55;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05899457074701786, Discriminator loss: 0.23769785091280937, Score_valid: 2.909320294857025[0m
+2022-11-29 06:31:55;INFO;----------------------------------------------------------------------
+2022-11-29 06:32:00;INFO;
+ <Epoch>: 59 -- Start training 
+2022-11-29 06:32:14;INFO;Train | Epoch 59 | 6/32 | 0.5 it/sec | Gen_loss 0.10322 | Disc_loss 0.42081
+2022-11-29 06:32:22;INFO;Train | Epoch 59 | 12/32 | 0.6 it/sec | Gen_loss 0.08815 | Disc_loss 0.33714
+2022-11-29 06:32:31;INFO;Train | Epoch 59 | 18/32 | 0.6 it/sec | Gen_loss 0.08421 | Disc_loss 0.27885
+2022-11-29 06:32:39;INFO;Train | Epoch 59 | 24/32 | 0.7 it/sec | Gen_loss 0.10365 | Disc_loss 0.42301
+2022-11-29 06:32:47;INFO;Train | Epoch 59 | 30/32 | 0.7 it/sec | Gen_loss 0.09447 | Disc_loss 0.37209
+2022-11-29 06:32:50;INFO;----------------------------------------------------------------------
+2022-11-29 06:32:50;INFO;[1m     Epoch 59 - Overall Summary Training | Generator loss: 0.09555456694215536, Discriminator loss: 0.3706899294629693[0m
+PESQ:  [ 1.44523191  2.52731371  3.39965463 -1.        ]
+2022-11-29 06:32:59;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05789834260940552, Discriminator loss: 0.23674776032567024, Score_valid: 2.906961739063263[0m
+2022-11-29 06:32:59;INFO;----------------------------------------------------------------------
+2022-11-29 06:32:59;INFO;
+ <Epoch>: 60 -- Start training 
+2022-11-29 06:33:13;INFO;Train | Epoch 60 | 6/32 | 0.5 it/sec | Gen_loss 0.10689 | Disc_loss 0.40557
+2022-11-29 06:33:22;INFO;Train | Epoch 60 | 12/32 | 0.6 it/sec | Gen_loss 0.08423 | Disc_loss 0.31939
+2022-11-29 06:33:30;INFO;Train | Epoch 60 | 18/32 | 0.6 it/sec | Gen_loss 0.08128 | Disc_loss 0.29513
+2022-11-29 06:33:38;INFO;Train | Epoch 60 | 24/32 | 0.6 it/sec | Gen_loss 0.09857 | Disc_loss 0.38182
+2022-11-29 06:33:47;INFO;Train | Epoch 60 | 30/32 | 0.7 it/sec | Gen_loss 0.09148 | Disc_loss 0.34775
+2022-11-29 06:33:49;INFO;----------------------------------------------------------------------
+2022-11-29 06:33:49;INFO;[1m     Epoch 60 - Overall Summary Training | Generator loss: 0.09426993341185153, Discriminator loss: 0.36444786842912436[0m
+2022-11-29 06:33:58;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05948102008551359, Discriminator loss: 0.2396027408540249, Score_valid: 2.8960318565368652[0m
+2022-11-29 06:33:58;INFO;----------------------------------------------------------------------
+2022-11-29 06:35:51;INFO;[1m     Evaluation Summary:  | Epoch 60 | Pesq 2.85857 | Csig 4.38975 | Cbak 3.57210 | Covl 3.68879 | Ssnr 9.40101 | Stoi 0.93924[0m
+2022-11-29 06:35:51;INFO;
+ <Epoch>: 61 -- Start training 
+2022-11-29 06:36:05;INFO;Train | Epoch 61 | 6/32 | 0.5 it/sec | Gen_loss 0.10397 | Disc_loss 0.42489
+2022-11-29 06:36:13;INFO;Train | Epoch 61 | 12/32 | 0.6 it/sec | Gen_loss 0.08743 | Disc_loss 0.30627
+2022-11-29 06:36:21;INFO;Train | Epoch 61 | 18/32 | 0.6 it/sec | Gen_loss 0.08661 | Disc_loss 0.29830
+2022-11-29 06:36:30;INFO;Train | Epoch 61 | 24/32 | 0.7 it/sec | Gen_loss 0.10301 | Disc_loss 0.41392
+2022-11-29 06:36:38;INFO;Train | Epoch 61 | 30/32 | 0.7 it/sec | Gen_loss 0.08986 | Disc_loss 0.35096
+PESQ:  [ 3.46524215  2.8991828   2.14614248 -1.        ]
+2022-11-29 06:36:41;INFO;----------------------------------------------------------------------
+2022-11-29 06:36:41;INFO;[1m     Epoch 61 - Overall Summary Training | Generator loss: 0.09390797116793692, Discriminator loss: 0.3645822424441576[0m
+2022-11-29 06:36:49;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05799600947648287, Discriminator loss: 0.23573555424809456, Score_valid: 2.9073521494865417[0m
+2022-11-29 06:36:49;INFO;----------------------------------------------------------------------
+2022-11-29 06:36:50;INFO;
+ <Epoch>: 62 -- Start training 
+2022-11-29 06:37:03;INFO;Train | Epoch 62 | 6/32 | 0.5 it/sec | Gen_loss 0.10158 | Disc_loss 0.38346
+2022-11-29 06:37:12;INFO;Train | Epoch 62 | 12/32 | 0.6 it/sec | Gen_loss 0.08419 | Disc_loss 0.30858
+2022-11-29 06:37:20;INFO;Train | Epoch 62 | 18/32 | 0.6 it/sec | Gen_loss 0.08451 | Disc_loss 0.28944
+2022-11-29 06:37:28;INFO;Train | Epoch 62 | 24/32 | 0.7 it/sec | Gen_loss 0.10238 | Disc_loss 0.40045
+2022-11-29 06:37:37;INFO;Train | Epoch 62 | 30/32 | 0.7 it/sec | Gen_loss 0.09613 | Disc_loss 0.35118
+2022-11-29 06:37:40;INFO;----------------------------------------------------------------------
+2022-11-29 06:37:40;INFO;[1m     Epoch 62 - Overall Summary Training | Generator loss: 0.09376102383248508, Discriminator loss: 0.3580084824934602[0m
+2022-11-29 06:37:48;INFO;[1m             - Overall Summary Validation | Generator loss: 0.059127592481672764, Discriminator loss: 0.2402014024555683, Score_valid: 2.8945939540863037[0m
+2022-11-29 06:37:48;INFO;----------------------------------------------------------------------
+2022-11-29 06:37:48;INFO;
+ <Epoch>: 63 -- Start training 
+2022-11-29 06:38:02;INFO;Train | Epoch 63 | 6/32 | 0.5 it/sec | Gen_loss 0.10338 | Disc_loss 0.40196
+2022-11-29 06:38:11;INFO;Train | Epoch 63 | 12/32 | 0.6 it/sec | Gen_loss 0.08481 | Disc_loss 0.33039
+2022-11-29 06:38:19;INFO;Train | Epoch 63 | 18/32 | 0.6 it/sec | Gen_loss 0.08141 | Disc_loss 0.27570
+2022-11-29 06:38:27;INFO;Train | Epoch 63 | 24/32 | 0.6 it/sec | Gen_loss 0.10336 | Disc_loss 0.40154
+2022-11-29 06:38:36;INFO;Train | Epoch 63 | 30/32 | 0.7 it/sec | Gen_loss 0.09305 | Disc_loss 0.36966
+PESQ:  [-1.          2.73618865  1.23069274  3.58356166]
+2022-11-29 06:38:39;INFO;----------------------------------------------------------------------
+2022-11-29 06:38:39;INFO;[1m     Epoch 63 - Overall Summary Training | Generator loss: 0.09375312714837492, Discriminator loss: 0.36300591472536325[0m
+2022-11-29 06:38:47;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05811208672821522, Discriminator loss: 0.24212991818785667, Score_valid: 2.8802114129066467[0m
+2022-11-29 06:38:47;INFO;----------------------------------------------------------------------
+2022-11-29 06:38:48;INFO;
+ <Epoch>: 64 -- Start training 
+2022-11-29 06:39:01;INFO;Train | Epoch 64 | 6/32 | 0.5 it/sec | Gen_loss 0.09839 | Disc_loss 0.37268
+2022-11-29 06:39:10;INFO;Train | Epoch 64 | 12/32 | 0.6 it/sec | Gen_loss 0.08633 | Disc_loss 0.32998
+2022-11-29 06:39:18;INFO;Train | Epoch 64 | 18/32 | 0.6 it/sec | Gen_loss 0.08311 | Disc_loss 0.29519
+2022-11-29 06:39:26;INFO;Train | Epoch 64 | 24/32 | 0.7 it/sec | Gen_loss 0.10274 | Disc_loss 0.38912
+2022-11-29 06:39:35;INFO;Train | Epoch 64 | 30/32 | 0.7 it/sec | Gen_loss 0.09439 | Disc_loss 0.37708
+PESQ:  [ 3.02605486  1.22772145  1.78399134 -1.        ]
+2022-11-29 06:39:37;INFO;----------------------------------------------------------------------
+2022-11-29 06:39:37;INFO;[1m     Epoch 64 - Overall Summary Training | Generator loss: 0.094315514434129, Discriminator loss: 0.36510378681123257[0m
+2022-11-29 06:39:51;INFO;[1m             - Overall Summary Validation | Generator loss: 0.058091623708605766, Discriminator loss: 0.22555377706885338, Score_valid: 2.946151316165924[0m
+2022-11-29 06:39:51;INFO;----------------------------------------------------------------------
+2022-11-29 06:39:52;INFO;
+ <Epoch>: 65 -- Start training 
+2022-11-29 06:40:05;INFO;Train | Epoch 65 | 6/32 | 0.5 it/sec | Gen_loss 0.10110 | Disc_loss 0.36947
+2022-11-29 06:40:14;INFO;Train | Epoch 65 | 12/32 | 0.6 it/sec | Gen_loss 0.08698 | Disc_loss 0.30872
+2022-11-29 06:40:23;INFO;Train | Epoch 65 | 18/32 | 0.6 it/sec | Gen_loss 0.08167 | Disc_loss 0.27712
+2022-11-29 06:40:31;INFO;Train | Epoch 65 | 24/32 | 0.7 it/sec | Gen_loss 0.10160 | Disc_loss 0.39072
+2022-11-29 06:40:39;INFO;Train | Epoch 65 | 30/32 | 0.7 it/sec | Gen_loss 0.09570 | Disc_loss 0.35758
+2022-11-29 06:40:42;INFO;----------------------------------------------------------------------
+2022-11-29 06:40:42;INFO;[1m     Epoch 65 - Overall Summary Training | Generator loss: 0.09393621631897986, Discriminator loss: 0.36113513354212046[0m
+2022-11-29 06:40:50;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05811828840523958, Discriminator loss: 0.23788069933652878, Score_valid: 2.901537537574768[0m
+2022-11-29 06:40:50;INFO;----------------------------------------------------------------------
+2022-11-29 06:42:46;INFO;[1m     Evaluation Summary:  | Epoch 65 | Pesq 2.87015 | Csig 4.39729 | Cbak 3.61216 | Covl 3.69788 | Ssnr 9.94638 | Stoi 0.93983[0m
+2022-11-29 06:42:47;INFO;
+ <Epoch>: 66 -- Start training 
+2022-11-29 06:43:01;INFO;Train | Epoch 66 | 6/32 | 0.5 it/sec | Gen_loss 0.10255 | Disc_loss 0.38408
+2022-11-29 06:43:09;INFO;Train | Epoch 66 | 12/32 | 0.6 it/sec | Gen_loss 0.08484 | Disc_loss 0.30495
+2022-11-29 06:43:17;INFO;Train | Epoch 66 | 18/32 | 0.6 it/sec | Gen_loss 0.08349 | Disc_loss 0.28858
+2022-11-29 06:43:25;INFO;Train | Epoch 66 | 24/32 | 0.7 it/sec | Gen_loss 0.10086 | Disc_loss 0.38644
+2022-11-29 06:43:34;INFO;Train | Epoch 66 | 30/32 | 0.7 it/sec | Gen_loss 0.09489 | Disc_loss 0.38414
+2022-11-29 06:43:36;INFO;----------------------------------------------------------------------
+2022-11-29 06:43:36;INFO;[1m     Epoch 66 - Overall Summary Training | Generator loss: 0.09374054940417409, Discriminator loss: 0.3642071159556508[0m
+2022-11-29 06:43:45;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05845467373728752, Discriminator loss: 0.2384660392999649, Score_valid: 2.902304530143738[0m
+2022-11-29 06:43:45;INFO;----------------------------------------------------------------------
+2022-11-29 06:43:45;INFO;
+ <Epoch>: 67 -- Start training 
+2022-11-29 06:43:59;INFO;Train | Epoch 67 | 6/32 | 0.5 it/sec | Gen_loss 0.09956 | Disc_loss 0.36216
+2022-11-29 06:44:07;INFO;Train | Epoch 67 | 12/32 | 0.6 it/sec | Gen_loss 0.08251 | Disc_loss 0.29889
+2022-11-29 06:44:15;INFO;Train | Epoch 67 | 18/32 | 0.6 it/sec | Gen_loss 0.08575 | Disc_loss 0.27039
+2022-11-29 06:44:24;INFO;Train | Epoch 67 | 24/32 | 0.7 it/sec | Gen_loss 0.10378 | Disc_loss 0.40380
+2022-11-29 06:44:32;INFO;Train | Epoch 67 | 30/32 | 0.7 it/sec | Gen_loss 0.09559 | Disc_loss 0.37278
+2022-11-29 06:44:35;INFO;----------------------------------------------------------------------
+2022-11-29 06:44:35;INFO;[1m     Epoch 67 - Overall Summary Training | Generator loss: 0.09350202768109739, Discriminator loss: 0.36090479977428913[0m
+2022-11-29 06:44:43;INFO;[1m             - Overall Summary Validation | Generator loss: 0.057489088736474514, Discriminator loss: 0.23312560841441154, Score_valid: 2.913814425468445[0m
+2022-11-29 06:44:43;INFO;----------------------------------------------------------------------
+2022-11-29 06:44:44;INFO;
+ <Epoch>: 68 -- Start training 
+2022-11-29 06:44:57;INFO;Train | Epoch 68 | 6/32 | 0.5 it/sec | Gen_loss 0.10316 | Disc_loss 0.39378
+2022-11-29 06:45:06;INFO;Train | Epoch 68 | 12/32 | 0.6 it/sec | Gen_loss 0.08585 | Disc_loss 0.29377
+2022-11-29 06:45:14;INFO;Train | Epoch 68 | 18/32 | 0.6 it/sec | Gen_loss 0.08405 | Disc_loss 0.27825
+2022-11-29 06:45:23;INFO;Train | Epoch 68 | 24/32 | 0.6 it/sec | Gen_loss 0.10114 | Disc_loss 0.39827
+2022-11-29 06:45:31;INFO;Train | Epoch 68 | 30/32 | 0.7 it/sec | Gen_loss 0.08993 | Disc_loss 0.35391
+2022-11-29 06:45:34;INFO;----------------------------------------------------------------------
+2022-11-29 06:45:34;INFO;[1m     Epoch 68 - Overall Summary Training | Generator loss: 0.09385834145359695, Discriminator loss: 0.3615751275792718[0m
+PESQ:  [-1.          1.37213659  2.69502664  2.94700098]
+2022-11-29 06:45:42;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05823721829801798, Discriminator loss: 0.23872904106974602, Score_valid: 2.893193006515503[0m
+2022-11-29 06:45:42;INFO;----------------------------------------------------------------------
+2022-11-29 06:45:43;INFO;
+ <Epoch>: 69 -- Start training 
+2022-11-29 06:45:56;INFO;Train | Epoch 69 | 6/32 | 0.5 it/sec | Gen_loss 0.10473 | Disc_loss 0.40072
+2022-11-29 06:46:05;INFO;Train | Epoch 69 | 12/32 | 0.6 it/sec | Gen_loss 0.08316 | Disc_loss 0.29410
+2022-11-29 06:46:13;INFO;Train | Epoch 69 | 18/32 | 0.6 it/sec | Gen_loss 0.08711 | Disc_loss 0.30718
+2022-11-29 06:46:22;INFO;Train | Epoch 69 | 24/32 | 0.7 it/sec | Gen_loss 0.09943 | Disc_loss 0.39826
+2022-11-29 06:46:30;INFO;Train | Epoch 69 | 30/32 | 0.7 it/sec | Gen_loss 0.09117 | Disc_loss 0.33922
+2022-11-29 06:46:33;INFO;----------------------------------------------------------------------
+2022-11-29 06:46:33;INFO;[1m     Epoch 69 - Overall Summary Training | Generator loss: 0.09346559969708323, Discriminator loss: 0.35829269979149103[0m
+2022-11-29 06:46:41;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05881605576723814, Discriminator loss: 0.24254684895277023, Score_valid: 2.877958834171295[0m
+2022-11-29 06:46:41;INFO;----------------------------------------------------------------------
+2022-11-29 06:46:41;INFO;
+ <Epoch>: 70 -- Start training 
+2022-11-29 06:46:55;INFO;Train | Epoch 70 | 6/32 | 0.5 it/sec | Gen_loss 0.10395 | Disc_loss 0.38264
+2022-11-29 06:47:03;INFO;Train | Epoch 70 | 12/32 | 0.6 it/sec | Gen_loss 0.08642 | Disc_loss 0.32540
+2022-11-29 06:47:12;INFO;Train | Epoch 70 | 18/32 | 0.6 it/sec | Gen_loss 0.08334 | Disc_loss 0.28831
+2022-11-29 06:47:20;INFO;Train | Epoch 70 | 24/32 | 0.7 it/sec | Gen_loss 0.10053 | Disc_loss 0.39438
+2022-11-29 06:47:28;INFO;Train | Epoch 70 | 30/32 | 0.7 it/sec | Gen_loss 0.08979 | Disc_loss 0.34698
+2022-11-29 06:47:31;INFO;----------------------------------------------------------------------
+2022-11-29 06:47:31;INFO;[1m     Epoch 70 - Overall Summary Training | Generator loss: 0.09336447552777827, Discriminator loss: 0.3578078858554363[0m
+2022-11-29 06:47:40;INFO;[1m             - Overall Summary Validation | Generator loss: 0.0587245924398303, Discriminator loss: 0.2415877729654312, Score_valid: 2.882673680782318[0m
+2022-11-29 06:47:40;INFO;----------------------------------------------------------------------
+2022-11-29 06:49:35;INFO;[1m     Evaluation Summary:  | Epoch 70 | Pesq 2.84931 | Csig 4.38758 | Cbak 3.58892 | Covl 3.68147 | Ssnr 9.73093 | Stoi 0.93997[0m
+2022-11-29 06:49:35;INFO;
+ <Epoch>: 71 -- Start training 
+2022-11-29 06:49:49;INFO;Train | Epoch 71 | 6/32 | 0.5 it/sec | Gen_loss 0.10182 | Disc_loss 0.38169
+2022-11-29 06:49:57;INFO;Train | Epoch 71 | 12/32 | 0.6 it/sec | Gen_loss 0.08264 | Disc_loss 0.32106
+2022-11-29 06:50:05;INFO;Train | Epoch 71 | 18/32 | 0.6 it/sec | Gen_loss 0.08310 | Disc_loss 0.29467
+2022-11-29 06:50:14;INFO;Train | Epoch 71 | 24/32 | 0.7 it/sec | Gen_loss 0.10197 | Disc_loss 0.38958
+2022-11-29 06:50:22;INFO;Train | Epoch 71 | 30/32 | 0.7 it/sec | Gen_loss 0.09471 | Disc_loss 0.36445
+2022-11-29 06:50:25;INFO;----------------------------------------------------------------------
+2022-11-29 06:50:25;INFO;[1m     Epoch 71 - Overall Summary Training | Generator loss: 0.0932546928524971, Discriminator loss: 0.3601292837411165[0m
+2022-11-29 06:50:33;INFO;[1m             - Overall Summary Validation | Generator loss: 0.058022258803248405, Discriminator loss: 0.23245074599981308, Score_valid: 2.917289912700653[0m
+2022-11-29 06:50:33;INFO;----------------------------------------------------------------------
+2022-11-29 06:50:34;INFO;
+ <Epoch>: 72 -- Start training 
+2022-11-29 06:50:47;INFO;Train | Epoch 72 | 6/32 | 0.5 it/sec | Gen_loss 0.09996 | Disc_loss 0.36858
+2022-11-29 06:50:56;INFO;Train | Epoch 72 | 12/32 | 0.6 it/sec | Gen_loss 0.08227 | Disc_loss 0.31249
+2022-11-29 06:51:04;INFO;Train | Epoch 72 | 18/32 | 0.6 it/sec | Gen_loss 0.08354 | Disc_loss 0.28821
+2022-11-29 06:51:12;INFO;Train | Epoch 72 | 24/32 | 0.7 it/sec | Gen_loss 0.10134 | Disc_loss 0.38175
+2022-11-29 06:51:21;INFO;Train | Epoch 72 | 30/32 | 0.7 it/sec | Gen_loss 0.09341 | Disc_loss 0.35284
+2022-11-29 06:51:23;INFO;----------------------------------------------------------------------
+2022-11-29 06:51:23;INFO;[1m     Epoch 72 - Overall Summary Training | Generator loss: 0.09311866690404713, Discriminator loss: 0.3542936407029629[0m
+PESQ:  [-1.          2.85704613  2.62362885  3.20497799]
+2022-11-29 06:51:32;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05956009030342102, Discriminator loss: 0.24361688643693924, Score_valid: 2.883903205394745[0m
+2022-11-29 06:51:32;INFO;----------------------------------------------------------------------
+2022-11-29 06:51:33;INFO;
+ <Epoch>: 73 -- Start training 
+2022-11-29 06:51:46;INFO;Train | Epoch 73 | 6/32 | 0.5 it/sec | Gen_loss 0.10668 | Disc_loss 0.40437
+2022-11-29 06:51:54;INFO;Train | Epoch 73 | 12/32 | 0.6 it/sec | Gen_loss 0.08672 | Disc_loss 0.30448
+2022-11-29 06:52:03;INFO;Train | Epoch 73 | 18/32 | 0.6 it/sec | Gen_loss 0.08282 | Disc_loss 0.29010
+2022-11-29 06:52:11;INFO;Train | Epoch 73 | 24/32 | 0.7 it/sec | Gen_loss 0.10189 | Disc_loss 0.40414
+2022-11-29 06:52:20;INFO;Train | Epoch 73 | 30/32 | 0.7 it/sec | Gen_loss 0.08618 | Disc_loss 0.30091
+2022-11-29 06:52:22;INFO;----------------------------------------------------------------------
+2022-11-29 06:52:22;INFO;[1m     Epoch 73 - Overall Summary Training | Generator loss: 0.09346904652193189, Discriminator loss: 0.3565558809787035[0m
+2022-11-29 06:52:31;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05819156765937805, Discriminator loss: 0.24706881120800972, Score_valid: 2.866579294204712[0m
+2022-11-29 06:52:31;INFO;----------------------------------------------------------------------
+2022-11-29 06:52:31;INFO;
+ <Epoch>: 74 -- Start training 
+2022-11-29 06:52:45;INFO;Train | Epoch 74 | 6/32 | 0.5 it/sec | Gen_loss 0.10364 | Disc_loss 0.38180
+2022-11-29 06:52:53;INFO;Train | Epoch 74 | 12/32 | 0.6 it/sec | Gen_loss 0.08521 | Disc_loss 0.32334
+2022-11-29 06:53:02;INFO;Train | Epoch 74 | 18/32 | 0.6 it/sec | Gen_loss 0.08256 | Disc_loss 0.28889
+2022-11-29 06:53:10;INFO;Train | Epoch 74 | 24/32 | 0.6 it/sec | Gen_loss 0.10199 | Disc_loss 0.40109
+2022-11-29 06:53:19;INFO;Train | Epoch 74 | 30/32 | 0.7 it/sec | Gen_loss 0.08821 | Disc_loss 0.34888
+2022-11-29 06:53:22;INFO;----------------------------------------------------------------------
+2022-11-29 06:53:22;INFO;[1m     Epoch 74 - Overall Summary Training | Generator loss: 0.09313153568655252, Discriminator loss: 0.3590854685753584[0m
+2022-11-29 06:53:30;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05771454703062773, Discriminator loss: 0.22731149196624756, Score_valid: 2.9367400407791138[0m
+2022-11-29 06:53:30;INFO;----------------------------------------------------------------------
+2022-11-29 06:53:31;INFO;
+ <Epoch>: 75 -- Start training 
+2022-11-29 06:53:44;INFO;Train | Epoch 75 | 6/32 | 0.5 it/sec | Gen_loss 0.09830 | Disc_loss 0.37849
+2022-11-29 06:53:52;INFO;Train | Epoch 75 | 12/32 | 0.6 it/sec | Gen_loss 0.08185 | Disc_loss 0.28774
+2022-11-29 06:54:01;INFO;Train | Epoch 75 | 18/32 | 0.6 it/sec | Gen_loss 0.08367 | Disc_loss 0.28838
+2022-11-29 06:54:09;INFO;Train | Epoch 75 | 24/32 | 0.7 it/sec | Gen_loss 0.09924 | Disc_loss 0.38540
+2022-11-29 06:54:17;INFO;Train | Epoch 75 | 30/32 | 0.7 it/sec | Gen_loss 0.09239 | Disc_loss 0.33312
+2022-11-29 06:54:20;INFO;----------------------------------------------------------------------
+2022-11-29 06:54:20;INFO;[1m     Epoch 75 - Overall Summary Training | Generator loss: 0.09293456608429551, Discriminator loss: 0.360349684022367[0m
+2022-11-29 06:54:28;INFO;[1m             - Overall Summary Validation | Generator loss: 0.057454164139926434, Discriminator loss: 0.2357996627688408, Score_valid: 2.9067795276641846[0m
+2022-11-29 06:54:28;INFO;----------------------------------------------------------------------
+2022-11-29 06:56:22;INFO;[1m     Evaluation Summary:  | Epoch 75 | Pesq 2.88850 | Csig 4.41090 | Cbak 3.62019 | Covl 3.71402 | Ssnr 9.92617 | Stoi 0.94024[0m
+2022-11-29 06:56:22;INFO;
+ <Epoch>: 76 -- Start training 
+2022-11-29 06:56:36;INFO;Train | Epoch 76 | 6/32 | 0.5 it/sec | Gen_loss 0.10281 | Disc_loss 0.38975
+2022-11-29 06:56:45;INFO;Train | Epoch 76 | 12/32 | 0.6 it/sec | Gen_loss 0.08223 | Disc_loss 0.29394
+2022-11-29 06:56:53;INFO;Train | Epoch 76 | 18/32 | 0.6 it/sec | Gen_loss 0.08299 | Disc_loss 0.29937
+2022-11-29 06:57:02;INFO;Train | Epoch 76 | 24/32 | 0.6 it/sec | Gen_loss 0.10351 | Disc_loss 0.38508
+2022-11-29 06:57:10;INFO;Train | Epoch 76 | 30/32 | 0.7 it/sec | Gen_loss 0.09138 | Disc_loss 0.35946
+2022-11-29 06:57:13;INFO;----------------------------------------------------------------------
+2022-11-29 06:57:13;INFO;[1m     Epoch 76 - Overall Summary Training | Generator loss: 0.09305001120083034, Discriminator loss: 0.35419270396232605[0m
+2022-11-29 06:57:22;INFO;[1m             - Overall Summary Validation | Generator loss: 0.057966725900769234, Discriminator loss: 0.2421041503548622, Score_valid: 2.8878764510154724[0m
+2022-11-29 06:57:22;INFO;----------------------------------------------------------------------
+2022-11-29 06:57:22;INFO;
+ <Epoch>: 77 -- Start training 
+2022-11-29 06:57:36;INFO;Train | Epoch 77 | 6/32 | 0.5 it/sec | Gen_loss 0.10138 | Disc_loss 0.39431
+2022-11-29 06:57:44;INFO;Train | Epoch 77 | 12/32 | 0.6 it/sec | Gen_loss 0.08326 | Disc_loss 0.30427
+2022-11-29 06:57:53;INFO;Train | Epoch 77 | 18/32 | 0.6 it/sec | Gen_loss 0.08374 | Disc_loss 0.29880
+2022-11-29 06:58:01;INFO;Train | Epoch 77 | 24/32 | 0.7 it/sec | Gen_loss 0.10306 | Disc_loss 0.40265
+2022-11-29 06:58:09;INFO;Train | Epoch 77 | 30/32 | 0.7 it/sec | Gen_loss 0.09253 | Disc_loss 0.35666
+PESQ:  [ 3.57715654  3.74363112  2.59158349 -1.        ]
+2022-11-29 06:58:12;INFO;----------------------------------------------------------------------
+2022-11-29 06:58:12;INFO;[1m     Epoch 77 - Overall Summary Training | Generator loss: 0.09347934578545392, Discriminator loss: 0.3575475038960576[0m
+2022-11-29 06:58:20;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05745274480432272, Discriminator loss: 0.2449124939739704, Score_valid: 2.875998556613922[0m
+2022-11-29 06:58:20;INFO;----------------------------------------------------------------------
+2022-11-29 06:58:21;INFO;
+ <Epoch>: 78 -- Start training 
+2022-11-29 06:58:35;INFO;Train | Epoch 78 | 6/32 | 0.5 it/sec | Gen_loss 0.10132 | Disc_loss 0.37686
+2022-11-29 06:58:43;INFO;Train | Epoch 78 | 12/32 | 0.6 it/sec | Gen_loss 0.08463 | Disc_loss 0.30020
+2022-11-29 06:58:51;INFO;Train | Epoch 78 | 18/32 | 0.6 it/sec | Gen_loss 0.08297 | Disc_loss 0.31248
+2022-11-29 06:59:00;INFO;Train | Epoch 78 | 24/32 | 0.6 it/sec | Gen_loss 0.10223 | Disc_loss 0.39106
+2022-11-29 06:59:08;INFO;Train | Epoch 78 | 30/32 | 0.7 it/sec | Gen_loss 0.09323 | Disc_loss 0.36079
+2022-11-29 06:59:11;INFO;----------------------------------------------------------------------
+2022-11-29 06:59:11;INFO;[1m     Epoch 78 - Overall Summary Training | Generator loss: 0.09427433321252465, Discriminator loss: 0.3631742401048541[0m
+2022-11-29 06:59:19;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05776825174689293, Discriminator loss: 0.2329922467470169, Score_valid: 2.9164398908615112[0m
+2022-11-29 06:59:19;INFO;----------------------------------------------------------------------
+2022-11-29 06:59:20;INFO;
+ <Epoch>: 79 -- Start training 
+2022-11-29 06:59:33;INFO;Train | Epoch 79 | 6/32 | 0.5 it/sec | Gen_loss 0.09930 | Disc_loss 0.37814
+2022-11-29 06:59:42;INFO;Train | Epoch 79 | 12/32 | 0.6 it/sec | Gen_loss 0.08394 | Disc_loss 0.30405
+2022-11-29 06:59:51;INFO;Train | Epoch 79 | 18/32 | 0.6 it/sec | Gen_loss 0.08482 | Disc_loss 0.28622
+2022-11-29 06:59:59;INFO;Train | Epoch 79 | 24/32 | 0.6 it/sec | Gen_loss 0.10101 | Disc_loss 0.39937
+2022-11-29 07:00:07;INFO;Train | Epoch 79 | 30/32 | 0.7 it/sec | Gen_loss 0.09324 | Disc_loss 0.34686
+2022-11-29 07:00:10;INFO;----------------------------------------------------------------------
+2022-11-29 07:00:10;INFO;[1m     Epoch 79 - Overall Summary Training | Generator loss: 0.09254809189587831, Discriminator loss: 0.35724841989576817[0m
+2022-11-29 07:00:19;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05916107818484306, Discriminator loss: 0.24436043202877045, Score_valid: 2.8737797141075134[0m
+2022-11-29 07:00:19;INFO;----------------------------------------------------------------------
+2022-11-29 07:00:19;INFO;
+ <Epoch>: 80 -- Start training 
+2022-11-29 07:00:33;INFO;Train | Epoch 80 | 6/32 | 0.5 it/sec | Gen_loss 0.09949 | Disc_loss 0.38599
+2022-11-29 07:00:41;INFO;Train | Epoch 80 | 12/32 | 0.6 it/sec | Gen_loss 0.08517 | Disc_loss 0.31910
+2022-11-29 07:00:49;INFO;Train | Epoch 80 | 18/32 | 0.6 it/sec | Gen_loss 0.08040 | Disc_loss 0.27571
+2022-11-29 07:00:58;INFO;Train | Epoch 80 | 24/32 | 0.7 it/sec | Gen_loss 0.09979 | Disc_loss 0.39831
+2022-11-29 07:01:06;INFO;Train | Epoch 80 | 30/32 | 0.7 it/sec | Gen_loss 0.09409 | Disc_loss 0.38009
+2022-11-29 07:01:09;INFO;----------------------------------------------------------------------
+2022-11-29 07:01:09;INFO;[1m     Epoch 80 - Overall Summary Training | Generator loss: 0.09253698773682117, Discriminator loss: 0.35475889313966036[0m
+PESQ:  [ 3.59150076  3.54234576  2.58100677 -1.        ]
+2022-11-29 07:01:17;INFO;[1m             - Overall Summary Validation | Generator loss: 0.057395617477595806, Discriminator loss: 0.22758997231721878, Score_valid: 2.937532126903534[0m
+2022-11-29 07:01:17;INFO;----------------------------------------------------------------------
+2022-11-29 07:03:09;INFO;[1m     Evaluation Summary:  | Epoch 80 | Pesq 2.91620 | Csig 4.42971 | Cbak 3.64080 | Covl 3.73880 | Ssnr 10.04545 | Stoi 0.93991[0m
+2022-11-29 07:03:10;INFO;
+ <Epoch>: 81 -- Start training 
+2022-11-29 07:03:24;INFO;Train | Epoch 81 | 6/32 | 0.5 it/sec | Gen_loss 0.10051 | Disc_loss 0.38992
+2022-11-29 07:03:32;INFO;Train | Epoch 81 | 12/32 | 0.6 it/sec | Gen_loss 0.08482 | Disc_loss 0.31059
+2022-11-29 07:03:41;INFO;Train | Epoch 81 | 18/32 | 0.6 it/sec | Gen_loss 0.08285 | Disc_loss 0.28119
+2022-11-29 07:03:49;INFO;Train | Epoch 81 | 24/32 | 0.6 it/sec | Gen_loss 0.09978 | Disc_loss 0.38554
+2022-11-29 07:03:58;INFO;Train | Epoch 81 | 30/32 | 0.7 it/sec | Gen_loss 0.09221 | Disc_loss 0.32605
+2022-11-29 07:04:00;INFO;----------------------------------------------------------------------
+2022-11-29 07:04:00;INFO;[1m     Epoch 81 - Overall Summary Training | Generator loss: 0.09261725330725312, Discriminator loss: 0.3524020276963711[0m
+PESQ:  [ 1.56992984  2.73750544  3.35193491 -1.        ]
+2022-11-29 07:04:09;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05728957988321781, Discriminator loss: 0.22698863595724106, Score_valid: 2.935246467590332[0m
+2022-11-29 07:04:09;INFO;----------------------------------------------------------------------
+2022-11-29 07:04:09;INFO;
+ <Epoch>: 82 -- Start training 
+2022-11-29 07:04:23;INFO;Train | Epoch 82 | 6/32 | 0.5 it/sec | Gen_loss 0.10031 | Disc_loss 0.38013
+2022-11-29 07:04:31;INFO;Train | Epoch 82 | 12/32 | 0.6 it/sec | Gen_loss 0.08406 | Disc_loss 0.30137
+2022-11-29 07:04:39;INFO;Train | Epoch 82 | 18/32 | 0.6 it/sec | Gen_loss 0.08470 | Disc_loss 0.29514
+2022-11-29 07:04:48;INFO;Train | Epoch 82 | 24/32 | 0.7 it/sec | Gen_loss 0.09998 | Disc_loss 0.40762
+2022-11-29 07:04:56;INFO;Train | Epoch 82 | 30/32 | 0.7 it/sec | Gen_loss 0.09405 | Disc_loss 0.36939
+2022-11-29 07:04:59;INFO;----------------------------------------------------------------------
+2022-11-29 07:04:59;INFO;[1m     Epoch 82 - Overall Summary Training | Generator loss: 0.09316798415966332, Discriminator loss: 0.3608700418844819[0m
+2022-11-29 07:05:07;INFO;[1m             - Overall Summary Validation | Generator loss: 0.057725539430975914, Discriminator loss: 0.23219343274831772, Score_valid: 2.91943359375[0m
+2022-11-29 07:05:07;INFO;----------------------------------------------------------------------
+2022-11-29 07:05:08;INFO;
+ <Epoch>: 83 -- Start training 
+2022-11-29 07:05:22;INFO;Train | Epoch 83 | 6/32 | 0.5 it/sec | Gen_loss 0.10107 | Disc_loss 0.40313
+2022-11-29 07:05:30;INFO;Train | Epoch 83 | 12/32 | 0.6 it/sec | Gen_loss 0.08442 | Disc_loss 0.30197
+2022-11-29 07:05:39;INFO;Train | Epoch 83 | 18/32 | 0.6 it/sec | Gen_loss 0.08655 | Disc_loss 0.29979
+2022-11-29 07:05:47;INFO;Train | Epoch 83 | 24/32 | 0.6 it/sec | Gen_loss 0.09690 | Disc_loss 0.34440
+2022-11-29 07:05:55;INFO;Train | Epoch 83 | 30/32 | 0.7 it/sec | Gen_loss 0.09113 | Disc_loss 0.34569
+2022-11-29 07:05:58;INFO;----------------------------------------------------------------------
+2022-11-29 07:05:58;INFO;[1m     Epoch 83 - Overall Summary Training | Generator loss: 0.09292912017554045, Discriminator loss: 0.35478843562304974[0m
+2022-11-29 07:06:06;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05738053470849991, Discriminator loss: 0.23340030014514923, Score_valid: 2.9171102643013[0m
+2022-11-29 07:06:06;INFO;----------------------------------------------------------------------
+2022-11-29 07:06:07;INFO;
+ <Epoch>: 84 -- Start training 
+2022-11-29 07:06:20;INFO;Train | Epoch 84 | 6/32 | 0.5 it/sec | Gen_loss 0.09987 | Disc_loss 0.35427
+2022-11-29 07:06:29;INFO;Train | Epoch 84 | 12/32 | 0.6 it/sec | Gen_loss 0.08660 | Disc_loss 0.29772
+2022-11-29 07:06:37;INFO;Train | Epoch 84 | 18/32 | 0.6 it/sec | Gen_loss 0.08231 | Disc_loss 0.26814
+2022-11-29 07:06:45;INFO;Train | Epoch 84 | 24/32 | 0.7 it/sec | Gen_loss 0.10539 | Disc_loss 0.41037
+2022-11-29 07:06:54;INFO;Train | Epoch 84 | 30/32 | 0.7 it/sec | Gen_loss 0.08999 | Disc_loss 0.32746
+2022-11-29 07:06:56;INFO;----------------------------------------------------------------------
+2022-11-29 07:06:56;INFO;[1m     Epoch 84 - Overall Summary Training | Generator loss: 0.09262046054936945, Discriminator loss: 0.3496972322463989[0m
+2022-11-29 07:07:05;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05757335387170315, Discriminator loss: 0.22969963774085045, Score_valid: 2.926499903202057[0m
+2022-11-29 07:07:05;INFO;----------------------------------------------------------------------
+2022-11-29 07:07:05;INFO;
+ <Epoch>: 85 -- Start training 
+2022-11-29 07:07:19;INFO;Train | Epoch 85 | 6/32 | 0.5 it/sec | Gen_loss 0.10105 | Disc_loss 0.39726
+2022-11-29 07:07:28;INFO;Train | Epoch 85 | 12/32 | 0.6 it/sec | Gen_loss 0.08162 | Disc_loss 0.28582
+2022-11-29 07:07:36;INFO;Train | Epoch 85 | 18/32 | 0.6 it/sec | Gen_loss 0.08272 | Disc_loss 0.29253
+2022-11-29 07:07:44;INFO;Train | Epoch 85 | 24/32 | 0.6 it/sec | Gen_loss 0.10018 | Disc_loss 0.40206
+2022-11-29 07:07:53;INFO;Train | Epoch 85 | 30/32 | 0.7 it/sec | Gen_loss 0.08977 | Disc_loss 0.35180
+2022-11-29 07:07:55;INFO;----------------------------------------------------------------------
+2022-11-29 07:07:55;INFO;[1m     Epoch 85 - Overall Summary Training | Generator loss: 0.09197581163607538, Discriminator loss: 0.3517648261040449[0m
+2022-11-29 07:08:04;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05826057493686676, Discriminator loss: 0.2364729903638363, Score_valid: 2.903333902359009[0m
+2022-11-29 07:08:04;INFO;----------------------------------------------------------------------
+2022-11-29 07:09:55;INFO;[1m     Evaluation Summary:  | Epoch 85 | Pesq 2.87486 | Csig 4.40410 | Cbak 3.61197 | Covl 3.70390 | Ssnr 9.90211 | Stoi 0.94052[0m
+2022-11-29 07:09:56;INFO;
+ <Epoch>: 86 -- Start training 
+2022-11-29 07:10:10;INFO;Train | Epoch 86 | 6/32 | 0.5 it/sec | Gen_loss 0.10538 | Disc_loss 0.38031
+2022-11-29 07:10:18;INFO;Train | Epoch 86 | 12/32 | 0.6 it/sec | Gen_loss 0.08500 | Disc_loss 0.29127
+2022-11-29 07:10:26;INFO;Train | Epoch 86 | 18/32 | 0.6 it/sec | Gen_loss 0.08157 | Disc_loss 0.26799
+2022-11-29 07:10:35;INFO;Train | Epoch 86 | 24/32 | 0.6 it/sec | Gen_loss 0.09756 | Disc_loss 0.37642
+2022-11-29 07:10:43;INFO;Train | Epoch 86 | 30/32 | 0.7 it/sec | Gen_loss 0.09179 | Disc_loss 0.33317
+2022-11-29 07:10:46;INFO;----------------------------------------------------------------------
+2022-11-29 07:10:46;INFO;[1m     Epoch 86 - Overall Summary Training | Generator loss: 0.09217712213285267, Discriminator loss: 0.3502185894176364[0m
+2022-11-29 07:10:55;INFO;[1m             - Overall Summary Validation | Generator loss: 0.057687764056026936, Discriminator loss: 0.2314399629831314, Score_valid: 2.9196555614471436[0m
+2022-11-29 07:10:55;INFO;----------------------------------------------------------------------
+2022-11-29 07:10:55;INFO;
+ <Epoch>: 87 -- Start training 
+2022-11-29 07:11:09;INFO;Train | Epoch 87 | 6/32 | 0.5 it/sec | Gen_loss 0.10175 | Disc_loss 0.39016
+2022-11-29 07:11:18;INFO;Train | Epoch 87 | 12/32 | 0.6 it/sec | Gen_loss 0.08243 | Disc_loss 0.29590
+2022-11-29 07:11:26;INFO;Train | Epoch 87 | 18/32 | 0.6 it/sec | Gen_loss 0.08680 | Disc_loss 0.31702
+2022-11-29 07:11:35;INFO;Train | Epoch 87 | 24/32 | 0.6 it/sec | Gen_loss 0.10045 | Disc_loss 0.37679
+2022-11-29 07:11:43;INFO;Train | Epoch 87 | 30/32 | 0.7 it/sec | Gen_loss 0.09267 | Disc_loss 0.35282
+2022-11-29 07:11:46;INFO;----------------------------------------------------------------------
+2022-11-29 07:11:46;INFO;[1m     Epoch 87 - Overall Summary Training | Generator loss: 0.09219917212612927, Discriminator loss: 0.354892167262733[0m
+2022-11-29 07:11:54;INFO;[1m             - Overall Summary Validation | Generator loss: 0.058326900005340576, Discriminator loss: 0.23358285427093506, Score_valid: 2.915838837623596[0m
+2022-11-29 07:11:54;INFO;----------------------------------------------------------------------
+2022-11-29 07:11:55;INFO;
+ <Epoch>: 88 -- Start training 
+2022-11-29 07:12:09;INFO;Train | Epoch 88 | 6/32 | 0.5 it/sec | Gen_loss 0.09950 | Disc_loss 0.35804
+2022-11-29 07:12:17;INFO;Train | Epoch 88 | 12/32 | 0.6 it/sec | Gen_loss 0.08203 | Disc_loss 0.30870
+2022-11-29 07:12:25;INFO;Train | Epoch 88 | 18/32 | 0.6 it/sec | Gen_loss 0.08137 | Disc_loss 0.28762
+2022-11-29 07:12:34;INFO;Train | Epoch 88 | 24/32 | 0.6 it/sec | Gen_loss 0.09526 | Disc_loss 0.36206
+2022-11-29 07:12:42;INFO;Train | Epoch 88 | 30/32 | 0.7 it/sec | Gen_loss 0.09128 | Disc_loss 0.33155
+2022-11-29 07:12:45;INFO;----------------------------------------------------------------------
+2022-11-29 07:12:45;INFO;[1m     Epoch 88 - Overall Summary Training | Generator loss: 0.09206670965068042, Discriminator loss: 0.3497062297537923[0m
+2022-11-29 07:12:54;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05978321749716997, Discriminator loss: 0.24125266820192337, Score_valid: 2.8831912875175476[0m
+2022-11-29 07:12:54;INFO;----------------------------------------------------------------------
+2022-11-29 07:12:54;INFO;
+ <Epoch>: 89 -- Start training 
+2022-11-29 07:13:08;INFO;Train | Epoch 89 | 6/32 | 0.5 it/sec | Gen_loss 0.10324 | Disc_loss 0.40514
+2022-11-29 07:13:16;INFO;Train | Epoch 89 | 12/32 | 0.6 it/sec | Gen_loss 0.08372 | Disc_loss 0.31307
+2022-11-29 07:13:24;INFO;Train | Epoch 89 | 18/32 | 0.6 it/sec | Gen_loss 0.08535 | Disc_loss 0.29267
+2022-11-29 07:13:33;INFO;Train | Epoch 89 | 24/32 | 0.7 it/sec | Gen_loss 0.10057 | Disc_loss 0.39534
+2022-11-29 07:13:41;INFO;Train | Epoch 89 | 30/32 | 0.7 it/sec | Gen_loss 0.09009 | Disc_loss 0.33469
+PESQ:  [ 2.67903852  3.65342999  1.62639809 -1.        ]
+2022-11-29 07:13:44;INFO;----------------------------------------------------------------------
+2022-11-29 07:13:44;INFO;[1m     Epoch 89 - Overall Summary Training | Generator loss: 0.0923815225251019, Discriminator loss: 0.35200591664761305[0m
+2022-11-29 07:13:52;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05749340448528528, Discriminator loss: 0.23320432752370834, Score_valid: 2.918260931968689[0m
+2022-11-29 07:13:52;INFO;----------------------------------------------------------------------
+2022-11-29 07:13:53;INFO;
+ <Epoch>: 90 -- Start training 
+2022-11-29 07:14:06;INFO;Train | Epoch 90 | 6/32 | 0.5 it/sec | Gen_loss 0.10061 | Disc_loss 0.37376
+2022-11-29 07:14:15;INFO;Train | Epoch 90 | 12/32 | 0.6 it/sec | Gen_loss 0.08314 | Disc_loss 0.29178
+2022-11-29 07:14:24;INFO;Train | Epoch 90 | 18/32 | 0.6 it/sec | Gen_loss 0.08106 | Disc_loss 0.28779
+2022-11-29 07:14:32;INFO;Train | Epoch 90 | 24/32 | 0.6 it/sec | Gen_loss 0.10226 | Disc_loss 0.39462
+2022-11-29 07:14:40;INFO;Train | Epoch 90 | 30/32 | 0.7 it/sec | Gen_loss 0.08968 | Disc_loss 0.32739
+2022-11-29 07:14:43;INFO;----------------------------------------------------------------------
+2022-11-29 07:14:43;INFO;[1m     Epoch 90 - Overall Summary Training | Generator loss: 0.09159593004733324, Discriminator loss: 0.34852631390094757[0m
+2022-11-29 07:14:52;INFO;[1m             - Overall Summary Validation | Generator loss: 0.056534457951784134, Discriminator loss: 0.22661283984780312, Score_valid: 2.9452176094055176[0m
+2022-11-29 07:14:52;INFO;----------------------------------------------------------------------
+2022-11-29 07:16:41;INFO;[1m     Evaluation Summary:  | Epoch 90 | Pesq 2.92082 | Csig 4.43255 | Cbak 3.65078 | Covl 3.74173 | Ssnr 10.17018 | Stoi 0.94057[0m
+2022-11-29 07:16:42;INFO;
+ <Epoch>: 91 -- Start training 
+2022-11-29 07:16:55;INFO;Train | Epoch 91 | 6/32 | 0.5 it/sec | Gen_loss 0.10291 | Disc_loss 0.38840
+2022-11-29 07:17:04;INFO;Train | Epoch 91 | 12/32 | 0.6 it/sec | Gen_loss 0.08556 | Disc_loss 0.29824
+2022-11-29 07:17:12;INFO;Train | Epoch 91 | 18/32 | 0.6 it/sec | Gen_loss 0.07896 | Disc_loss 0.24683
+2022-11-29 07:17:21;INFO;Train | Epoch 91 | 24/32 | 0.6 it/sec | Gen_loss 0.09902 | Disc_loss 0.39024
+2022-11-29 07:17:29;INFO;Train | Epoch 91 | 30/32 | 0.7 it/sec | Gen_loss 0.09083 | Disc_loss 0.33343
+2022-11-29 07:17:32;INFO;----------------------------------------------------------------------
+2022-11-29 07:17:32;INFO;[1m     Epoch 91 - Overall Summary Training | Generator loss: 0.09216121933422983, Discriminator loss: 0.35109354741871357[0m
+2022-11-29 07:17:41;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05615329835563898, Discriminator loss: 0.2246215045452118, Score_valid: 2.9502845406532288[0m
+2022-11-29 07:17:41;INFO;----------------------------------------------------------------------
+2022-11-29 07:17:41;INFO;
+ <Epoch>: 92 -- Start training 
+2022-11-29 07:17:55;INFO;Train | Epoch 92 | 6/32 | 0.5 it/sec | Gen_loss 0.09967 | Disc_loss 0.38142
+2022-11-29 07:18:04;INFO;Train | Epoch 92 | 12/32 | 0.6 it/sec | Gen_loss 0.08629 | Disc_loss 0.30551
+2022-11-29 07:18:12;INFO;Train | Epoch 92 | 18/32 | 0.6 it/sec | Gen_loss 0.07823 | Disc_loss 0.26084
+2022-11-29 07:18:21;INFO;Train | Epoch 92 | 24/32 | 0.6 it/sec | Gen_loss 0.09897 | Disc_loss 0.39236
+2022-11-29 07:18:29;INFO;Train | Epoch 92 | 30/32 | 0.7 it/sec | Gen_loss 0.08940 | Disc_loss 0.34607
+2022-11-29 07:18:32;INFO;----------------------------------------------------------------------
+2022-11-29 07:18:32;INFO;[1m     Epoch 92 - Overall Summary Training | Generator loss: 0.09074835805222392, Discriminator loss: 0.3455895157530904[0m
+2022-11-29 07:18:41;INFO;[1m             - Overall Summary Validation | Generator loss: 0.056274245493113995, Discriminator loss: 0.22584712505340576, Score_valid: 2.94527804851532[0m
+2022-11-29 07:18:41;INFO;----------------------------------------------------------------------
+2022-11-29 07:18:41;INFO;
+ <Epoch>: 93 -- Start training 
+2022-11-29 07:18:55;INFO;Train | Epoch 93 | 6/32 | 0.5 it/sec | Gen_loss 0.09834 | Disc_loss 0.37117
+2022-11-29 07:19:04;INFO;Train | Epoch 93 | 12/32 | 0.6 it/sec | Gen_loss 0.08225 | Disc_loss 0.28475
+2022-11-29 07:19:12;INFO;Train | Epoch 93 | 18/32 | 0.6 it/sec | Gen_loss 0.08035 | Disc_loss 0.27762
+2022-11-29 07:19:21;INFO;Train | Epoch 93 | 24/32 | 0.6 it/sec | Gen_loss 0.09933 | Disc_loss 0.39612
+2022-11-29 07:19:29;INFO;Train | Epoch 93 | 30/32 | 0.7 it/sec | Gen_loss 0.08861 | Disc_loss 0.34431
+2022-11-29 07:19:32;INFO;----------------------------------------------------------------------
+2022-11-29 07:19:32;INFO;[1m     Epoch 93 - Overall Summary Training | Generator loss: 0.09092971426434815, Discriminator loss: 0.34376183804124594[0m
+2022-11-29 07:19:41;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05608375556766987, Discriminator loss: 0.22510544583201408, Score_valid: 2.9497287273406982[0m
+2022-11-29 07:19:41;INFO;----------------------------------------------------------------------
+2022-11-29 07:19:41;INFO;
+ <Epoch>: 94 -- Start training 
+2022-11-29 07:19:55;INFO;Train | Epoch 94 | 6/32 | 0.5 it/sec | Gen_loss 0.10214 | Disc_loss 0.40534
+2022-11-29 07:20:03;INFO;Train | Epoch 94 | 12/32 | 0.6 it/sec | Gen_loss 0.08375 | Disc_loss 0.29321
+2022-11-29 07:20:11;INFO;Train | Epoch 94 | 18/32 | 0.6 it/sec | Gen_loss 0.08493 | Disc_loss 0.27893
+2022-11-29 07:20:20;INFO;Train | Epoch 94 | 24/32 | 0.7 it/sec | Gen_loss 0.09641 | Disc_loss 0.37172
+2022-11-29 07:20:28;INFO;Train | Epoch 94 | 30/32 | 0.7 it/sec | Gen_loss 0.09130 | Disc_loss 0.33051
+2022-11-29 07:20:31;INFO;----------------------------------------------------------------------
+2022-11-29 07:20:31;INFO;[1m     Epoch 94 - Overall Summary Training | Generator loss: 0.09147708280943334, Discriminator loss: 0.343663826584816[0m
+PESQ:  [ 3.26598191  3.58465815  3.07224751 -1.        ]
+2022-11-29 07:20:40;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05649585835635662, Discriminator loss: 0.2242661602795124, Score_valid: 2.951737403869629[0m
+2022-11-29 07:20:40;INFO;----------------------------------------------------------------------
+2022-11-29 07:20:40;INFO;
+ <Epoch>: 95 -- Start training 
+2022-11-29 07:20:54;INFO;Train | Epoch 95 | 6/32 | 0.5 it/sec | Gen_loss 0.09958 | Disc_loss 0.38218
+2022-11-29 07:21:03;INFO;Train | Epoch 95 | 12/32 | 0.6 it/sec | Gen_loss 0.08397 | Disc_loss 0.28247
+2022-11-29 07:21:11;INFO;Train | Epoch 95 | 18/32 | 0.6 it/sec | Gen_loss 0.08750 | Disc_loss 0.29605
+2022-11-29 07:21:20;INFO;Train | Epoch 95 | 24/32 | 0.6 it/sec | Gen_loss 0.09837 | Disc_loss 0.37667
+2022-11-29 07:21:28;INFO;Train | Epoch 95 | 30/32 | 0.7 it/sec | Gen_loss 0.08997 | Disc_loss 0.33033
+2022-11-29 07:21:31;INFO;----------------------------------------------------------------------
+2022-11-29 07:21:31;INFO;[1m     Epoch 95 - Overall Summary Training | Generator loss: 0.0913179349154234, Discriminator loss: 0.3473256975412369[0m
+PESQ:  [-1.          3.74444079  2.93236065  3.00233722]
+2022-11-29 07:21:40;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05566015653312206, Discriminator loss: 0.2171129435300827, Score_valid: 2.9815874099731445[0m
+2022-11-29 07:21:40;INFO;----------------------------------------------------------------------
+2022-11-29 07:23:31;INFO;[1m     Evaluation Summary:  | Epoch 95 | Pesq 2.95602 | Csig 4.45423 | Cbak 3.67561 | Covl 3.77249 | Ssnr 10.29231 | Stoi 0.94121[0m
+2022-11-29 07:23:32;INFO;
+ <Epoch>: 96 -- Start training 
+2022-11-29 07:23:46;INFO;Train | Epoch 96 | 6/32 | 0.5 it/sec | Gen_loss 0.09558 | Disc_loss 0.35446
+2022-11-29 07:23:54;INFO;Train | Epoch 96 | 12/32 | 0.6 it/sec | Gen_loss 0.08155 | Disc_loss 0.29033
+2022-11-29 07:24:02;INFO;Train | Epoch 96 | 18/32 | 0.6 it/sec | Gen_loss 0.08480 | Disc_loss 0.29500
+2022-11-29 07:24:11;INFO;Train | Epoch 96 | 24/32 | 0.7 it/sec | Gen_loss 0.10379 | Disc_loss 0.41018
+2022-11-29 07:24:19;INFO;Train | Epoch 96 | 30/32 | 0.7 it/sec | Gen_loss 0.09273 | Disc_loss 0.34535
+2022-11-29 07:24:22;INFO;----------------------------------------------------------------------
+2022-11-29 07:24:22;INFO;[1m     Epoch 96 - Overall Summary Training | Generator loss: 0.09186923550441861, Discriminator loss: 0.34742771554738283[0m
+2022-11-29 07:24:31;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05578401871025562, Discriminator loss: 0.21976099535822868, Score_valid: 2.9706687927246094[0m
+2022-11-29 07:24:31;INFO;----------------------------------------------------------------------
+2022-11-29 07:24:31;INFO;
+ <Epoch>: 97 -- Start training 
+2022-11-29 07:24:45;INFO;Train | Epoch 97 | 6/32 | 0.5 it/sec | Gen_loss 0.09882 | Disc_loss 0.36183
+2022-11-29 07:24:53;INFO;Train | Epoch 97 | 12/32 | 0.6 it/sec | Gen_loss 0.08144 | Disc_loss 0.28054
+2022-11-29 07:25:02;INFO;Train | Epoch 97 | 18/32 | 0.6 it/sec | Gen_loss 0.08247 | Disc_loss 0.26360
+2022-11-29 07:25:10;INFO;Train | Epoch 97 | 24/32 | 0.6 it/sec | Gen_loss 0.09836 | Disc_loss 0.38507
+2022-11-29 07:25:18;INFO;Train | Epoch 97 | 30/32 | 0.7 it/sec | Gen_loss 0.09124 | Disc_loss 0.34542
+2022-11-29 07:25:21;INFO;----------------------------------------------------------------------
+2022-11-29 07:25:21;INFO;[1m     Epoch 97 - Overall Summary Training | Generator loss: 0.09143051411956549, Discriminator loss: 0.34475440718233585[0m
+2022-11-29 07:25:30;INFO;[1m             - Overall Summary Validation | Generator loss: 0.056230971589684486, Discriminator loss: 0.22765739262104034, Score_valid: 2.93490731716156[0m
+2022-11-29 07:25:30;INFO;----------------------------------------------------------------------
+2022-11-29 07:25:30;INFO;
+ <Epoch>: 98 -- Start training 
+2022-11-29 07:25:44;INFO;Train | Epoch 98 | 6/32 | 0.5 it/sec | Gen_loss 0.10133 | Disc_loss 0.38797
+2022-11-29 07:25:53;INFO;Train | Epoch 98 | 12/32 | 0.6 it/sec | Gen_loss 0.08114 | Disc_loss 0.29436
+2022-11-29 07:26:01;INFO;Train | Epoch 98 | 18/32 | 0.6 it/sec | Gen_loss 0.08336 | Disc_loss 0.28378
+2022-11-29 07:26:09;INFO;Train | Epoch 98 | 24/32 | 0.7 it/sec | Gen_loss 0.09883 | Disc_loss 0.39244
+2022-11-29 07:26:18;INFO;Train | Epoch 98 | 30/32 | 0.7 it/sec | Gen_loss 0.09324 | Disc_loss 0.34777
+2022-11-29 07:26:21;INFO;----------------------------------------------------------------------
+2022-11-29 07:26:21;INFO;[1m     Epoch 98 - Overall Summary Training | Generator loss: 0.09088791185058653, Discriminator loss: 0.34604980889707804[0m
+2022-11-29 07:26:29;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05654861219227314, Discriminator loss: 0.23175515979528427, Score_valid: 2.9223861694335938[0m
+2022-11-29 07:26:29;INFO;----------------------------------------------------------------------
+2022-11-29 07:26:30;INFO;
+ <Epoch>: 99 -- Start training 
+2022-11-29 07:26:44;INFO;Train | Epoch 99 | 6/32 | 0.5 it/sec | Gen_loss 0.09872 | Disc_loss 0.37208
+2022-11-29 07:26:52;INFO;Train | Epoch 99 | 12/32 | 0.6 it/sec | Gen_loss 0.08517 | Disc_loss 0.29368
+2022-11-29 07:27:01;INFO;Train | Epoch 99 | 18/32 | 0.6 it/sec | Gen_loss 0.08236 | Disc_loss 0.26615
+2022-11-29 07:27:09;INFO;Train | Epoch 99 | 24/32 | 0.6 it/sec | Gen_loss 0.10092 | Disc_loss 0.39276
+2022-11-29 07:27:18;INFO;Train | Epoch 99 | 30/32 | 0.7 it/sec | Gen_loss 0.09402 | Disc_loss 0.32970
+2022-11-29 07:27:21;INFO;----------------------------------------------------------------------
+2022-11-29 07:27:21;INFO;[1m     Epoch 99 - Overall Summary Training | Generator loss: 0.09168003383092582, Discriminator loss: 0.3478642450645566[0m
+2022-11-29 07:27:29;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05601687729358673, Discriminator loss: 0.21742217615246773, Score_valid: 2.9787047505378723[0m
+2022-11-29 07:27:29;INFO;----------------------------------------------------------------------
+2022-11-29 07:27:30;INFO;
+ <Epoch>: 100 -- Start training 
+2022-11-29 07:27:43;INFO;Train | Epoch 100 | 6/32 | 0.5 it/sec | Gen_loss 0.09978 | Disc_loss 0.37455
+2022-11-29 07:27:52;INFO;Train | Epoch 100 | 12/32 | 0.6 it/sec | Gen_loss 0.08139 | Disc_loss 0.30181
+2022-11-29 07:28:00;INFO;Train | Epoch 100 | 18/32 | 0.6 it/sec | Gen_loss 0.08521 | Disc_loss 0.31333
+2022-11-29 07:28:08;INFO;Train | Epoch 100 | 24/32 | 0.7 it/sec | Gen_loss 0.09941 | Disc_loss 0.39079
+2022-11-29 07:28:17;INFO;Train | Epoch 100 | 30/32 | 0.7 it/sec | Gen_loss 0.09078 | Disc_loss 0.32415
+2022-11-29 07:28:19;INFO;----------------------------------------------------------------------
+2022-11-29 07:28:19;INFO;[1m     Epoch 100 - Overall Summary Training | Generator loss: 0.09116865741088986, Discriminator loss: 0.3496475284919143[0m
+2022-11-29 07:28:28;INFO;[1m             - Overall Summary Validation | Generator loss: 0.056547089479863644, Discriminator loss: 0.22395089268684387, Score_valid: 2.9553471207618713[0m
+2022-11-29 07:28:28;INFO;----------------------------------------------------------------------
+2022-11-29 07:30:18;INFO;[1m     Evaluation Summary:  | Epoch 100 | Pesq 2.92539 | Csig 4.43675 | Cbak 3.65923 | Covl 3.74700 | Ssnr 10.26412 | Stoi 0.94105[0m
+2022-11-29 07:30:18;INFO;
+ <Epoch>: 101 -- Start training 
+2022-11-29 07:30:32;INFO;Train | Epoch 101 | 6/32 | 0.5 it/sec | Gen_loss 0.10226 | Disc_loss 0.37738
+2022-11-29 07:30:41;INFO;Train | Epoch 101 | 12/32 | 0.6 it/sec | Gen_loss 0.08314 | Disc_loss 0.31992
+2022-11-29 07:30:49;INFO;Train | Epoch 101 | 18/32 | 0.6 it/sec | Gen_loss 0.08772 | Disc_loss 0.29562
+2022-11-29 07:30:58;INFO;Train | Epoch 101 | 24/32 | 0.6 it/sec | Gen_loss 0.09808 | Disc_loss 0.38432
+2022-11-29 07:31:06;INFO;Train | Epoch 101 | 30/32 | 0.7 it/sec | Gen_loss 0.09186 | Disc_loss 0.33242
+2022-11-29 07:31:09;INFO;----------------------------------------------------------------------
+2022-11-29 07:31:09;INFO;[1m     Epoch 101 - Overall Summary Training | Generator loss: 0.09133470593951643, Discriminator loss: 0.3502498036250472[0m
+2022-11-29 07:31:18;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05657133087515831, Discriminator loss: 0.2265671007335186, Score_valid: 2.944168746471405[0m
+2022-11-29 07:31:18;INFO;----------------------------------------------------------------------
+2022-11-29 07:31:18;INFO;
+ <Epoch>: 102 -- Start training 
+2022-11-29 07:31:32;INFO;Train | Epoch 102 | 6/32 | 0.5 it/sec | Gen_loss 0.09745 | Disc_loss 0.39851
+2022-11-29 07:31:40;INFO;Train | Epoch 102 | 12/32 | 0.6 it/sec | Gen_loss 0.08295 | Disc_loss 0.29290
+2022-11-29 07:31:49;INFO;Train | Epoch 102 | 18/32 | 0.6 it/sec | Gen_loss 0.08201 | Disc_loss 0.27400
+2022-11-29 07:31:57;INFO;Train | Epoch 102 | 24/32 | 0.6 it/sec | Gen_loss 0.09812 | Disc_loss 0.37746
+2022-11-29 07:32:05;INFO;Train | Epoch 102 | 30/32 | 0.7 it/sec | Gen_loss 0.09276 | Disc_loss 0.35073
+2022-11-29 07:32:08;INFO;----------------------------------------------------------------------
+2022-11-29 07:32:08;INFO;[1m     Epoch 102 - Overall Summary Training | Generator loss: 0.09113162057474256, Discriminator loss: 0.34321716241538525[0m
+2022-11-29 07:32:16;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05616363976150751, Discriminator loss: 0.2253086268901825, Score_valid: 2.9467190504074097[0m
+2022-11-29 07:32:16;INFO;----------------------------------------------------------------------
+2022-11-29 07:32:17;INFO;
+ <Epoch>: 103 -- Start training 
+2022-11-29 07:32:30;INFO;Train | Epoch 103 | 6/32 | 0.5 it/sec | Gen_loss 0.10117 | Disc_loss 0.36922
+2022-11-29 07:32:39;INFO;Train | Epoch 103 | 12/32 | 0.6 it/sec | Gen_loss 0.08167 | Disc_loss 0.27878
+2022-11-29 07:32:47;INFO;Train | Epoch 103 | 18/32 | 0.6 it/sec | Gen_loss 0.07853 | Disc_loss 0.28747
+2022-11-29 07:32:55;INFO;Train | Epoch 103 | 24/32 | 0.7 it/sec | Gen_loss 0.09621 | Disc_loss 0.36736
+2022-11-29 07:33:04;INFO;Train | Epoch 103 | 30/32 | 0.7 it/sec | Gen_loss 0.08717 | Disc_loss 0.32020
+2022-11-29 07:33:06;INFO;----------------------------------------------------------------------
+2022-11-29 07:33:06;INFO;[1m     Epoch 103 - Overall Summary Training | Generator loss: 0.09040590468794107, Discriminator loss: 0.3418671078979969[0m
+2022-11-29 07:33:15;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05634963046759367, Discriminator loss: 0.22827456891536713, Score_valid: 2.9371548295021057[0m
+2022-11-29 07:33:15;INFO;----------------------------------------------------------------------
+2022-11-29 07:33:15;INFO;
+ <Epoch>: 104 -- Start training 
+2022-11-29 07:33:29;INFO;Train | Epoch 104 | 6/32 | 0.5 it/sec | Gen_loss 0.09704 | Disc_loss 0.36357
+2022-11-29 07:33:37;INFO;Train | Epoch 104 | 12/32 | 0.6 it/sec | Gen_loss 0.08219 | Disc_loss 0.28597
+2022-11-29 07:33:45;INFO;Train | Epoch 104 | 18/32 | 0.6 it/sec | Gen_loss 0.08100 | Disc_loss 0.26291
+2022-11-29 07:33:53;INFO;Train | Epoch 104 | 24/32 | 0.7 it/sec | Gen_loss 0.09913 | Disc_loss 0.39738
+2022-11-29 07:34:02;INFO;Train | Epoch 104 | 30/32 | 0.7 it/sec | Gen_loss 0.08910 | Disc_loss 0.33719
+2022-11-29 07:34:05;INFO;----------------------------------------------------------------------
+2022-11-29 07:34:05;INFO;[1m     Epoch 104 - Overall Summary Training | Generator loss: 0.09122596238739789, Discriminator loss: 0.34215759579092264[0m
+2022-11-29 07:34:13;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05611238442361355, Discriminator loss: 0.21921489760279655, Score_valid: 2.970339000225067[0m
+2022-11-29 07:34:13;INFO;----------------------------------------------------------------------
+2022-11-29 07:34:13;INFO;
+ <Epoch>: 105 -- Start training 
+2022-11-29 07:34:27;INFO;Train | Epoch 105 | 6/32 | 0.5 it/sec | Gen_loss 0.10096 | Disc_loss 0.37114
+2022-11-29 07:34:36;INFO;Train | Epoch 105 | 12/32 | 0.6 it/sec | Gen_loss 0.08204 | Disc_loss 0.28792
+2022-11-29 07:34:44;INFO;Train | Epoch 105 | 18/32 | 0.6 it/sec | Gen_loss 0.07854 | Disc_loss 0.27176
+2022-11-29 07:34:52;INFO;Train | Epoch 105 | 24/32 | 0.7 it/sec | Gen_loss 0.09452 | Disc_loss 0.36799
+2022-11-29 07:35:01;INFO;Train | Epoch 105 | 30/32 | 0.7 it/sec | Gen_loss 0.09236 | Disc_loss 0.35617
+2022-11-29 07:35:03;INFO;----------------------------------------------------------------------
+2022-11-29 07:35:03;INFO;[1m     Epoch 105 - Overall Summary Training | Generator loss: 0.09059204417280853, Discriminator loss: 0.34241678565740585[0m
+2022-11-29 07:35:12;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05661681294441223, Discriminator loss: 0.22282760962843895, Score_valid: 2.9523091316223145[0m
+2022-11-29 07:35:12;INFO;----------------------------------------------------------------------
+2022-11-29 07:37:02;INFO;[1m     Evaluation Summary:  | Epoch 105 | Pesq 2.94123 | Csig 4.44286 | Cbak 3.65934 | Covl 3.75753 | Ssnr 10.14856 | Stoi 0.94025[0m
+2022-11-29 07:37:03;INFO;
+ <Epoch>: 106 -- Start training 
+2022-11-29 07:37:16;INFO;Train | Epoch 106 | 6/32 | 0.5 it/sec | Gen_loss 0.10172 | Disc_loss 0.37209
+2022-11-29 07:37:24;INFO;Train | Epoch 106 | 12/32 | 0.6 it/sec | Gen_loss 0.07882 | Disc_loss 0.27110
+2022-11-29 07:37:33;INFO;Train | Epoch 106 | 18/32 | 0.6 it/sec | Gen_loss 0.08278 | Disc_loss 0.27489
+2022-11-29 07:37:41;INFO;Train | Epoch 106 | 24/32 | 0.7 it/sec | Gen_loss 0.09803 | Disc_loss 0.36709
+2022-11-29 07:37:49;INFO;Train | Epoch 106 | 30/32 | 0.7 it/sec | Gen_loss 0.09277 | Disc_loss 0.32654
+2022-11-29 07:37:52;INFO;----------------------------------------------------------------------
+2022-11-29 07:37:52;INFO;[1m     Epoch 106 - Overall Summary Training | Generator loss: 0.09125696192495525, Discriminator loss: 0.3436962282285094[0m
+2022-11-29 07:38:00;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05653306748718023, Discriminator loss: 0.2238161377608776, Score_valid: 2.951243281364441[0m
+2022-11-29 07:38:00;INFO;----------------------------------------------------------------------
+2022-11-29 07:38:01;INFO;
+ <Epoch>: 107 -- Start training 
+2022-11-29 07:38:15;INFO;Train | Epoch 107 | 6/32 | 0.5 it/sec | Gen_loss 0.10173 | Disc_loss 0.39110
+2022-11-29 07:38:23;INFO;Train | Epoch 107 | 12/32 | 0.6 it/sec | Gen_loss 0.08345 | Disc_loss 0.29054
+2022-11-29 07:38:32;INFO;Train | Epoch 107 | 18/32 | 0.6 it/sec | Gen_loss 0.08165 | Disc_loss 0.28531
+2022-11-29 07:38:40;INFO;Train | Epoch 107 | 24/32 | 0.6 it/sec | Gen_loss 0.09603 | Disc_loss 0.36451
+2022-11-29 07:38:48;INFO;Train | Epoch 107 | 30/32 | 0.7 it/sec | Gen_loss 0.09372 | Disc_loss 0.34556
+2022-11-29 07:38:51;INFO;----------------------------------------------------------------------
+2022-11-29 07:38:51;INFO;[1m     Epoch 107 - Overall Summary Training | Generator loss: 0.0915502340067178, Discriminator loss: 0.34559744223952293[0m
+2022-11-29 07:39:00;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05625302251428366, Discriminator loss: 0.2246813252568245, Score_valid: 2.946366786956787[0m
+2022-11-29 07:39:00;INFO;----------------------------------------------------------------------
+2022-11-29 07:39:00;INFO;
+ <Epoch>: 108 -- Start training 
+2022-11-29 07:39:14;INFO;Train | Epoch 108 | 6/32 | 0.5 it/sec | Gen_loss 0.09961 | Disc_loss 0.38150
+2022-11-29 07:39:22;INFO;Train | Epoch 108 | 12/32 | 0.6 it/sec | Gen_loss 0.08034 | Disc_loss 0.29916
+2022-11-29 07:39:31;INFO;Train | Epoch 108 | 18/32 | 0.6 it/sec | Gen_loss 0.08299 | Disc_loss 0.27422
+2022-11-29 07:39:39;INFO;Train | Epoch 108 | 24/32 | 0.6 it/sec | Gen_loss 0.09958 | Disc_loss 0.37778
+2022-11-29 07:39:47;INFO;Train | Epoch 108 | 30/32 | 0.7 it/sec | Gen_loss 0.09281 | Disc_loss 0.33531
+2022-11-29 07:39:50;INFO;----------------------------------------------------------------------
+2022-11-29 07:39:50;INFO;[1m     Epoch 108 - Overall Summary Training | Generator loss: 0.09117582673206925, Discriminator loss: 0.34580280631780624[0m
+2022-11-29 07:39:59;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05568106472492218, Discriminator loss: 0.21962567046284676, Score_valid: 2.96727192401886[0m
+2022-11-29 07:39:59;INFO;----------------------------------------------------------------------
+2022-11-29 07:39:59;INFO;
+ <Epoch>: 109 -- Start training 
+2022-11-29 07:40:13;INFO;Train | Epoch 109 | 6/32 | 0.5 it/sec | Gen_loss 0.10029 | Disc_loss 0.38849
+2022-11-29 07:40:21;INFO;Train | Epoch 109 | 12/32 | 0.6 it/sec | Gen_loss 0.08176 | Disc_loss 0.27805
+2022-11-29 07:40:30;INFO;Train | Epoch 109 | 18/32 | 0.6 it/sec | Gen_loss 0.08077 | Disc_loss 0.26687
+2022-11-29 07:40:38;INFO;Train | Epoch 109 | 24/32 | 0.7 it/sec | Gen_loss 0.09579 | Disc_loss 0.36220
+2022-11-29 07:40:46;INFO;Train | Epoch 109 | 30/32 | 0.7 it/sec | Gen_loss 0.09064 | Disc_loss 0.32471
+2022-11-29 07:40:49;INFO;----------------------------------------------------------------------
+2022-11-29 07:40:49;INFO;[1m     Epoch 109 - Overall Summary Training | Generator loss: 0.09109749016351998, Discriminator loss: 0.34333212953060865[0m
+2022-11-29 07:40:58;INFO;[1m             - Overall Summary Validation | Generator loss: 0.056280785240232944, Discriminator loss: 0.22354227304458618, Score_valid: 2.9562089443206787[0m
+2022-11-29 07:40:58;INFO;----------------------------------------------------------------------
+2022-11-29 07:40:58;INFO;
+ <Epoch>: 110 -- Start training 
+2022-11-29 07:41:12;INFO;Train | Epoch 110 | 6/32 | 0.5 it/sec | Gen_loss 0.10026 | Disc_loss 0.39311
+2022-11-29 07:41:20;INFO;Train | Epoch 110 | 12/32 | 0.6 it/sec | Gen_loss 0.08452 | Disc_loss 0.30027
+2022-11-29 07:41:29;INFO;Train | Epoch 110 | 18/32 | 0.6 it/sec | Gen_loss 0.08433 | Disc_loss 0.26535
+2022-11-29 07:41:37;INFO;Train | Epoch 110 | 24/32 | 0.7 it/sec | Gen_loss 0.09924 | Disc_loss 0.39918
+2022-11-29 07:41:45;INFO;Train | Epoch 110 | 30/32 | 0.7 it/sec | Gen_loss 0.08592 | Disc_loss 0.33995
+2022-11-29 07:41:48;INFO;----------------------------------------------------------------------
+2022-11-29 07:41:48;INFO;[1m     Epoch 110 - Overall Summary Training | Generator loss: 0.09098993963561952, Discriminator loss: 0.3465119553729892[0m
+2022-11-29 07:41:56;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05596333462744951, Discriminator loss: 0.2271506004035473, Score_valid: 2.941437005996704[0m
+2022-11-29 07:41:56;INFO;----------------------------------------------------------------------
+2022-11-29 07:43:48;INFO;[1m     Evaluation Summary:  | Epoch 110 | Pesq 2.91948 | Csig 4.43322 | Cbak 3.66436 | Covl 3.74162 | Ssnr 10.38648 | Stoi 0.94110[0m
+2022-11-29 07:43:48;INFO;
+ <Epoch>: 111 -- Start training 
+2022-11-29 07:44:02;INFO;Train | Epoch 111 | 6/32 | 0.5 it/sec | Gen_loss 0.09959 | Disc_loss 0.34414
+2022-11-29 07:44:10;INFO;Train | Epoch 111 | 12/32 | 0.6 it/sec | Gen_loss 0.08245 | Disc_loss 0.29962
+2022-11-29 07:44:18;INFO;Train | Epoch 111 | 18/32 | 0.6 it/sec | Gen_loss 0.08120 | Disc_loss 0.27606
+2022-11-29 07:44:27;INFO;Train | Epoch 111 | 24/32 | 0.7 it/sec | Gen_loss 0.10157 | Disc_loss 0.38519
+2022-11-29 07:44:35;INFO;Train | Epoch 111 | 30/32 | 0.7 it/sec | Gen_loss 0.08576 | Disc_loss 0.32598
+2022-11-29 07:44:38;INFO;----------------------------------------------------------------------
+2022-11-29 07:44:38;INFO;[1m     Epoch 111 - Overall Summary Training | Generator loss: 0.09069322538562119, Discriminator loss: 0.3419991862028837[0m
+2022-11-29 07:44:47;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05633828602731228, Discriminator loss: 0.22663601487874985, Score_valid: 2.946317493915558[0m
+2022-11-29 07:44:47;INFO;----------------------------------------------------------------------
+2022-11-29 07:44:47;INFO;
+ <Epoch>: 112 -- Start training 
+2022-11-29 07:45:01;INFO;Train | Epoch 112 | 6/32 | 0.5 it/sec | Gen_loss 0.10172 | Disc_loss 0.38137
+2022-11-29 07:45:09;INFO;Train | Epoch 112 | 12/32 | 0.6 it/sec | Gen_loss 0.08774 | Disc_loss 0.33607
+2022-11-29 07:45:17;INFO;Train | Epoch 112 | 18/32 | 0.6 it/sec | Gen_loss 0.08051 | Disc_loss 0.26501
+2022-11-29 07:45:25;INFO;Train | Epoch 112 | 24/32 | 0.7 it/sec | Gen_loss 0.10080 | Disc_loss 0.38377
+2022-11-29 07:45:34;INFO;Train | Epoch 112 | 30/32 | 0.7 it/sec | Gen_loss 0.09444 | Disc_loss 0.34394
+2022-11-29 07:45:37;INFO;----------------------------------------------------------------------
+2022-11-29 07:45:37;INFO;[1m     Epoch 112 - Overall Summary Training | Generator loss: 0.09171395259909332, Discriminator loss: 0.3464088886976242[0m
+2022-11-29 07:45:45;INFO;[1m             - Overall Summary Validation | Generator loss: 0.056367047131061554, Discriminator loss: 0.22122471407055855, Score_valid: 2.9628413915634155[0m
+2022-11-29 07:45:45;INFO;----------------------------------------------------------------------
+2022-11-29 07:45:46;INFO;
+ <Epoch>: 113 -- Start training 
+2022-11-29 07:45:59;INFO;Train | Epoch 113 | 6/32 | 0.5 it/sec | Gen_loss 0.10197 | Disc_loss 0.39822
+2022-11-29 07:46:08;INFO;Train | Epoch 113 | 12/32 | 0.6 it/sec | Gen_loss 0.08189 | Disc_loss 0.28154
+2022-11-29 07:46:16;INFO;Train | Epoch 113 | 18/32 | 0.6 it/sec | Gen_loss 0.08553 | Disc_loss 0.27049
+2022-11-29 07:46:24;INFO;Train | Epoch 113 | 24/32 | 0.7 it/sec | Gen_loss 0.09767 | Disc_loss 0.36768
+2022-11-29 07:46:33;INFO;Train | Epoch 113 | 30/32 | 0.7 it/sec | Gen_loss 0.09053 | Disc_loss 0.34324
+2022-11-29 07:46:36;INFO;----------------------------------------------------------------------
+2022-11-29 07:46:36;INFO;[1m     Epoch 113 - Overall Summary Training | Generator loss: 0.09132677526213229, Discriminator loss: 0.3438806813210249[0m
+2022-11-29 07:46:44;INFO;[1m             - Overall Summary Validation | Generator loss: 0.055945198982954025, Discriminator loss: 0.22184332832694054, Score_valid: 2.960616648197174[0m
+2022-11-29 07:46:44;INFO;----------------------------------------------------------------------
+2022-11-29 07:46:45;INFO;
+ <Epoch>: 114 -- Start training 
+2022-11-29 07:46:58;INFO;Train | Epoch 114 | 6/32 | 0.5 it/sec | Gen_loss 0.10006 | Disc_loss 0.37812
+2022-11-29 07:47:06;INFO;Train | Epoch 114 | 12/32 | 0.6 it/sec | Gen_loss 0.08045 | Disc_loss 0.26510
+2022-11-29 07:47:14;INFO;Train | Epoch 114 | 18/32 | 0.6 it/sec | Gen_loss 0.08014 | Disc_loss 0.27580
+2022-11-29 07:47:22;INFO;Train | Epoch 114 | 24/32 | 0.7 it/sec | Gen_loss 0.10039 | Disc_loss 0.38649
+2022-11-29 07:47:31;INFO;Train | Epoch 114 | 30/32 | 0.7 it/sec | Gen_loss 0.09096 | Disc_loss 0.33924
+PESQ:  [ 3.19900179  2.77828622  3.10594296 -1.        ]
+2022-11-29 07:47:34;INFO;----------------------------------------------------------------------
+2022-11-29 07:47:34;INFO;[1m     Epoch 114 - Overall Summary Training | Generator loss: 0.09011946967802942, Discriminator loss: 0.3380132410675287[0m
+2022-11-29 07:47:42;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05600488279014826, Discriminator loss: 0.220635287463665, Score_valid: 2.9635255932807922[0m
+2022-11-29 07:47:42;INFO;----------------------------------------------------------------------
+2022-11-29 07:47:43;INFO;
+ <Epoch>: 115 -- Start training 
+2022-11-29 07:47:56;INFO;Train | Epoch 115 | 6/32 | 0.5 it/sec | Gen_loss 0.09975 | Disc_loss 0.36409
+2022-11-29 07:48:05;INFO;Train | Epoch 115 | 12/32 | 0.6 it/sec | Gen_loss 0.08190 | Disc_loss 0.30573
+2022-11-29 07:48:13;INFO;Train | Epoch 115 | 18/32 | 0.6 it/sec | Gen_loss 0.07938 | Disc_loss 0.24807
+2022-11-29 07:48:21;INFO;Train | Epoch 115 | 24/32 | 0.7 it/sec | Gen_loss 0.09695 | Disc_loss 0.38040
+2022-11-29 07:48:29;INFO;Train | Epoch 115 | 30/32 | 0.7 it/sec | Gen_loss 0.08909 | Disc_loss 0.33664
+PESQ:  [ 1.4693979   2.75342703  2.99251652 -1.        ]
+2022-11-29 07:48:32;INFO;----------------------------------------------------------------------
+2022-11-29 07:48:32;INFO;[1m     Epoch 115 - Overall Summary Training | Generator loss: 0.09080355591140687, Discriminator loss: 0.34157730266451836[0m
+2022-11-29 07:48:40;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05629189033061266, Discriminator loss: 0.22071214765310287, Score_valid: 2.963814079761505[0m
+2022-11-29 07:48:40;INFO;----------------------------------------------------------------------
+2022-11-29 07:50:32;INFO;[1m     Evaluation Summary:  | Epoch 115 | Pesq 2.95240 | Csig 4.45458 | Cbak 3.66756 | Covl 3.76958 | Ssnr 10.19047 | Stoi 0.94091[0m
+2022-11-29 07:50:33;INFO;
+ <Epoch>: 116 -- Start training 
+2022-11-29 07:50:46;INFO;Train | Epoch 116 | 6/32 | 0.5 it/sec | Gen_loss 0.10339 | Disc_loss 0.39970
+2022-11-29 07:50:54;INFO;Train | Epoch 116 | 12/32 | 0.6 it/sec | Gen_loss 0.08211 | Disc_loss 0.28508
+2022-11-29 07:51:03;INFO;Train | Epoch 116 | 18/32 | 0.6 it/sec | Gen_loss 0.08215 | Disc_loss 0.28865
+2022-11-29 07:51:11;INFO;Train | Epoch 116 | 24/32 | 0.7 it/sec | Gen_loss 0.09823 | Disc_loss 0.39037
+2022-11-29 07:51:19;INFO;Train | Epoch 116 | 30/32 | 0.7 it/sec | Gen_loss 0.09243 | Disc_loss 0.33955
+2022-11-29 07:51:22;INFO;----------------------------------------------------------------------
+2022-11-29 07:51:22;INFO;[1m     Epoch 116 - Overall Summary Training | Generator loss: 0.0914127875585109, Discriminator loss: 0.3477344959974289[0m
+2022-11-29 07:51:30;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05602928809821606, Discriminator loss: 0.22778696566820145, Score_valid: 2.940430760383606[0m
+2022-11-29 07:51:30;INFO;----------------------------------------------------------------------
+2022-11-29 07:51:31;INFO;
+ <Epoch>: 117 -- Start training 
+2022-11-29 07:51:44;INFO;Train | Epoch 117 | 6/32 | 0.5 it/sec | Gen_loss 0.10061 | Disc_loss 0.37559
+2022-11-29 07:51:53;INFO;Train | Epoch 117 | 12/32 | 0.6 it/sec | Gen_loss 0.08411 | Disc_loss 0.29448
+2022-11-29 07:52:01;INFO;Train | Epoch 117 | 18/32 | 0.6 it/sec | Gen_loss 0.08242 | Disc_loss 0.28941
+2022-11-29 07:52:10;INFO;Train | Epoch 117 | 24/32 | 0.7 it/sec | Gen_loss 0.09816 | Disc_loss 0.37980
+2022-11-29 07:52:18;INFO;Train | Epoch 117 | 30/32 | 0.7 it/sec | Gen_loss 0.09356 | Disc_loss 0.35404
+2022-11-29 07:52:21;INFO;----------------------------------------------------------------------
+2022-11-29 07:52:21;INFO;[1m     Epoch 117 - Overall Summary Training | Generator loss: 0.09150937362574041, Discriminator loss: 0.34697450790554285[0m
+2022-11-29 07:52:30;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05603686533868313, Discriminator loss: 0.21892890706658363, Score_valid: 2.969844698905945[0m
+2022-11-29 07:52:30;INFO;----------------------------------------------------------------------
+2022-11-29 07:52:30;INFO;
+ <Epoch>: 118 -- Start training 
+2022-11-29 07:52:44;INFO;Train | Epoch 118 | 6/32 | 0.5 it/sec | Gen_loss 0.09757 | Disc_loss 0.36625
+2022-11-29 07:52:52;INFO;Train | Epoch 118 | 12/32 | 0.6 it/sec | Gen_loss 0.08148 | Disc_loss 0.28606
+2022-11-29 07:53:01;INFO;Train | Epoch 118 | 18/32 | 0.6 it/sec | Gen_loss 0.07929 | Disc_loss 0.26096
+2022-11-29 07:53:09;INFO;Train | Epoch 118 | 24/32 | 0.7 it/sec | Gen_loss 0.09417 | Disc_loss 0.36662
+2022-11-29 07:53:18;INFO;Train | Epoch 118 | 30/32 | 0.7 it/sec | Gen_loss 0.09040 | Disc_loss 0.32681
+2022-11-29 07:53:20;INFO;----------------------------------------------------------------------
+2022-11-29 07:53:20;INFO;[1m     Epoch 118 - Overall Summary Training | Generator loss: 0.09062242950312793, Discriminator loss: 0.3433635402470827[0m
+2022-11-29 07:53:29;INFO;[1m             - Overall Summary Validation | Generator loss: 0.056591399013996124, Discriminator loss: 0.2254561334848404, Score_valid: 2.948191285133362[0m
+2022-11-29 07:53:29;INFO;----------------------------------------------------------------------
+2022-11-29 07:53:29;INFO;
+ <Epoch>: 119 -- Start training 
+2022-11-29 07:53:43;INFO;Train | Epoch 119 | 6/32 | 0.5 it/sec | Gen_loss 0.09599 | Disc_loss 0.36468
+2022-11-29 07:53:51;INFO;Train | Epoch 119 | 12/32 | 0.6 it/sec | Gen_loss 0.08363 | Disc_loss 0.28781
+2022-11-29 07:53:59;INFO;Train | Epoch 119 | 18/32 | 0.6 it/sec | Gen_loss 0.08607 | Disc_loss 0.29933
+2022-11-29 07:54:07;INFO;Train | Epoch 119 | 24/32 | 0.7 it/sec | Gen_loss 0.09701 | Disc_loss 0.37342
+2022-11-29 07:54:16;INFO;Train | Epoch 119 | 30/32 | 0.7 it/sec | Gen_loss 0.09101 | Disc_loss 0.33461
+2022-11-29 07:54:19;INFO;----------------------------------------------------------------------
+2022-11-29 07:54:19;INFO;[1m     Epoch 119 - Overall Summary Training | Generator loss: 0.0906067444011569, Discriminator loss: 0.3433602126315236[0m
+2022-11-29 07:54:27;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05617278255522251, Discriminator loss: 0.22574607655405998, Score_valid: 2.9438151121139526[0m
+2022-11-29 07:54:27;INFO;----------------------------------------------------------------------
+2022-11-29 07:54:28;INFO;
+ <Epoch>: 120 -- Start training 
+2022-11-29 07:54:41;INFO;Train | Epoch 120 | 6/32 | 0.5 it/sec | Gen_loss 0.09823 | Disc_loss 0.37465
+2022-11-29 07:54:49;INFO;Train | Epoch 120 | 12/32 | 0.6 it/sec | Gen_loss 0.08156 | Disc_loss 0.28414
+2022-11-29 07:54:58;INFO;Train | Epoch 120 | 18/32 | 0.6 it/sec | Gen_loss 0.08254 | Disc_loss 0.29014
+2022-11-29 07:55:06;INFO;Train | Epoch 120 | 24/32 | 0.7 it/sec | Gen_loss 0.09542 | Disc_loss 0.35469
+2022-11-29 07:55:14;INFO;Train | Epoch 120 | 30/32 | 0.7 it/sec | Gen_loss 0.08950 | Disc_loss 0.33109
+2022-11-29 07:55:17;INFO;----------------------------------------------------------------------
+2022-11-29 07:55:17;INFO;[1m     Epoch 120 - Overall Summary Training | Generator loss: 0.09055258007720113, Discriminator loss: 0.3405440226197243[0m
+2022-11-29 07:55:26;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05608035530894995, Discriminator loss: 0.21656910702586174, Score_valid: 2.9811832904815674[0m
+2022-11-29 07:55:26;INFO;----------------------------------------------------------------------
+2022-11-29 07:57:15;INFO;[1m     Evaluation Summary:  | Epoch 120 | Pesq 2.96746 | Csig 4.46138 | Cbak 3.68131 | Covl 3.78158 | Ssnr 10.29243 | Stoi 0.94075[0m
+2022-11-29 07:57:16;INFO;
+ <Epoch>: 121 -- Start training 
+2022-11-29 07:57:30;INFO;Train | Epoch 121 | 6/32 | 0.5 it/sec | Gen_loss 0.09754 | Disc_loss 0.36105
+2022-11-29 07:57:38;INFO;Train | Epoch 121 | 12/32 | 0.6 it/sec | Gen_loss 0.08329 | Disc_loss 0.27738
+2022-11-29 07:57:47;INFO;Train | Epoch 121 | 18/32 | 0.6 it/sec | Gen_loss 0.08241 | Disc_loss 0.25241
+2022-11-29 07:57:55;INFO;Train | Epoch 121 | 24/32 | 0.6 it/sec | Gen_loss 0.09973 | Disc_loss 0.39740
+2022-11-29 07:58:03;INFO;Train | Epoch 121 | 30/32 | 0.7 it/sec | Gen_loss 0.09132 | Disc_loss 0.33027
+PESQ:  [ 3.25586057  1.91281199  3.08509088 -1.        ]
+2022-11-29 07:58:06;INFO;----------------------------------------------------------------------
+2022-11-29 07:58:06;INFO;[1m     Epoch 121 - Overall Summary Training | Generator loss: 0.09092112584039569, Discriminator loss: 0.3411238295957446[0m
+2022-11-29 07:58:15;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05536850728094578, Discriminator loss: 0.21725083515048027, Score_valid: 2.9760506749153137[0m
+2022-11-29 07:58:15;INFO;----------------------------------------------------------------------
+2022-11-29 07:58:15;INFO;
+ <Epoch>: 122 -- Start training 
+2022-11-29 07:58:29;INFO;Train | Epoch 122 | 6/32 | 0.5 it/sec | Gen_loss 0.09888 | Disc_loss 0.37413
+2022-11-29 07:58:37;INFO;Train | Epoch 122 | 12/32 | 0.6 it/sec | Gen_loss 0.08144 | Disc_loss 0.28850
+2022-11-29 07:58:46;INFO;Train | Epoch 122 | 18/32 | 0.6 it/sec | Gen_loss 0.08264 | Disc_loss 0.26279
+2022-11-29 07:58:54;INFO;Train | Epoch 122 | 24/32 | 0.7 it/sec | Gen_loss 0.10097 | Disc_loss 0.39163
+2022-11-29 07:59:02;INFO;Train | Epoch 122 | 30/32 | 0.7 it/sec | Gen_loss 0.08958 | Disc_loss 0.33811
+2022-11-29 07:59:05;INFO;----------------------------------------------------------------------
+2022-11-29 07:59:05;INFO;[1m     Epoch 122 - Overall Summary Training | Generator loss: 0.09031504252925515, Discriminator loss: 0.3374281255528331[0m
+2022-11-29 07:59:13;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05596262123435736, Discriminator loss: 0.21922949329018593, Score_valid: 2.970723867416382[0m
+2022-11-29 07:59:13;INFO;----------------------------------------------------------------------
+2022-11-29 07:59:14;INFO;
+ <Epoch>: 123 -- Start training 
+2022-11-29 07:59:27;INFO;Train | Epoch 123 | 6/32 | 0.5 it/sec | Gen_loss 0.09872 | Disc_loss 0.37880
+2022-11-29 07:59:36;INFO;Train | Epoch 123 | 12/32 | 0.6 it/sec | Gen_loss 0.08138 | Disc_loss 0.29860
+2022-11-29 07:59:44;INFO;Train | Epoch 123 | 18/32 | 0.6 it/sec | Gen_loss 0.08233 | Disc_loss 0.28536
+2022-11-29 07:59:52;INFO;Train | Epoch 123 | 24/32 | 0.7 it/sec | Gen_loss 0.09964 | Disc_loss 0.39357
+2022-11-29 08:00:00;INFO;Train | Epoch 123 | 30/32 | 0.7 it/sec | Gen_loss 0.09394 | Disc_loss 0.34348
+PESQ:  [ 3.52367043  3.20236731  2.4393568  -1.        ]
+2022-11-29 08:00:03;INFO;----------------------------------------------------------------------
+2022-11-29 08:00:03;INFO;[1m     Epoch 123 - Overall Summary Training | Generator loss: 0.09098726254887879, Discriminator loss: 0.34680674131959677[0m
+2022-11-29 08:00:12;INFO;[1m             - Overall Summary Validation | Generator loss: 0.056104859337210655, Discriminator loss: 0.21759328618645668, Score_valid: 2.97611927986145[0m
+2022-11-29 08:00:12;INFO;----------------------------------------------------------------------
+2022-11-29 08:00:12;INFO;
+ <Epoch>: 124 -- Start training 
+2022-11-29 08:00:26;INFO;Train | Epoch 124 | 6/32 | 0.5 it/sec | Gen_loss 0.09700 | Disc_loss 0.35304
+2022-11-29 08:00:35;INFO;Train | Epoch 124 | 12/32 | 0.6 it/sec | Gen_loss 0.08083 | Disc_loss 0.28179
+2022-11-29 08:00:43;INFO;Train | Epoch 124 | 18/32 | 0.6 it/sec | Gen_loss 0.08342 | Disc_loss 0.29121
+2022-11-29 08:00:51;INFO;Train | Epoch 124 | 24/32 | 0.6 it/sec | Gen_loss 0.09856 | Disc_loss 0.39344
+2022-11-29 08:01:00;INFO;Train | Epoch 124 | 30/32 | 0.7 it/sec | Gen_loss 0.09005 | Disc_loss 0.35805
+2022-11-29 08:01:02;INFO;----------------------------------------------------------------------
+2022-11-29 08:01:02;INFO;[1m     Epoch 124 - Overall Summary Training | Generator loss: 0.09034183085896075, Discriminator loss: 0.33797803800553083[0m
+2022-11-29 08:01:11;INFO;[1m             - Overall Summary Validation | Generator loss: 0.056040300987660885, Discriminator loss: 0.21989188715815544, Score_valid: 2.965922772884369[0m
+2022-11-29 08:01:11;INFO;----------------------------------------------------------------------
+2022-11-29 08:01:11;INFO;
+ <Epoch>: 125 -- Start training 
+2022-11-29 08:01:25;INFO;Train | Epoch 125 | 6/32 | 0.5 it/sec | Gen_loss 0.09600 | Disc_loss 0.35672
+2022-11-29 08:01:33;INFO;Train | Epoch 125 | 12/32 | 0.6 it/sec | Gen_loss 0.08046 | Disc_loss 0.27239
+2022-11-29 08:01:42;INFO;Train | Epoch 125 | 18/32 | 0.6 it/sec | Gen_loss 0.08217 | Disc_loss 0.27558
+2022-11-29 08:01:50;INFO;Train | Epoch 125 | 24/32 | 0.7 it/sec | Gen_loss 0.09671 | Disc_loss 0.37185
+2022-11-29 08:01:58;INFO;Train | Epoch 125 | 30/32 | 0.7 it/sec | Gen_loss 0.09313 | Disc_loss 0.33962
+2022-11-29 08:02:01;INFO;----------------------------------------------------------------------
+2022-11-29 08:02:01;INFO;[1m     Epoch 125 - Overall Summary Training | Generator loss: 0.09017730504274368, Discriminator loss: 0.34090971760451794[0m
+2022-11-29 08:02:09;INFO;[1m             - Overall Summary Validation | Generator loss: 0.05616186652332544, Discriminator loss: 0.22566375508904457, Score_valid: 2.9432390928268433[0m
+2022-11-29 08:02:09;INFO;----------------------------------------------------------------------
+2022-11-29 08:04:01;INFO;[1m     Evaluation Summary:  | Epoch 125 | Pesq 2.91741 | Csig 4.43432 | Cbak 3.65975 | Covl 3.74080 | Ssnr 10.32717 | Stoi 0.94152[0m
+2022-11-29 08:04:01;INFO;
+ <Epoch>: 126 -- Start training 
+2022-11-29 08:04:15;INFO;Train | Epoch 126 | 6/32 | 0.5 it/sec | Gen_loss 0.09885 | Disc_loss 0.38570
+2022-11-29 08:04:23;INFO;Train | Epoch 126 | 12/32 | 0.6 it/sec | Gen_loss 0.08290 | Disc_loss 0.28851
+2022-11-29 08:04:31;INFO;Train | Epoch 126 | 18/32 | 0.6 it/sec | Gen_loss 0.08125 | Disc_loss 0.26977
+2022-11-29 08:04:39;INFO;Train | Epoch 126 | 24/32 | 0.7 it/sec | Gen_loss 0.10011 | Disc_loss 0.38076
+2022-11-29 08:04:48;INFO;Train | Epoch 126 | 30/32 | 0.7 it/sec | Gen_loss 0.08875 | Disc_loss 0.32366
+2022-11-29 08:04:51;INFO;----------------------------------------------------------------------
+2022-11-29 08:04:51;INFO;[1m     Epoch 126 - Overall Summary Training | Generator loss: 0.08972455514594913, Discriminator loss: 0.33586914651095867[0m
+2022-11-29 08:04:59;INFO;[1m             - Overall Summary Validation | Generator loss: 0.055620526894927025, Discriminator loss: 0.21531834080815315, Score_valid: 2.9838868975639343[0m
+2022-11-29 08:04:59;INFO;----------------------------------------------------------------------
+Training Process Done
