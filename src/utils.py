@@ -212,6 +212,7 @@ def get_logger(log_dir, log_name=None, resume="", is_rank0=True):
             log_name = os.path.basename(sys.argv[0]).split(".")[0] + (".log")
         file_handler = logging.FileHandler(os.path.join(log_dir, log_name), mode=mode)
         file_handler.setLevel(level=logging.INFO)
+        file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
     else:
         logger = NoOp()
