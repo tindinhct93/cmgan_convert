@@ -205,10 +205,11 @@ class Trainer(BaseTrainer):
             clean_mag = torch.sqrt(clean_real**2 + clean_imag**2)
 
             predict_fake_metric = self.model_discriminator(clean_mag, est_mag)
-            gen_loss_GAN = F.mse_loss(predict_fake_metric.flatten(), one_labels.float())
+            gen_loss_GAN = (predict_fake_metric.flatten() - one_labels.float())**2
 
-            loss_mag = F.mse_loss(est_mag, clean_mag)
-            loss_ri = F.mse_loss(est_real, clean_real) + F.mse_loss(est_imag, clean_imag)
+            loss_mag = torch.mean(((est_mag - clean_mag)**2).reshape(est_mag.shape[0], -1), 1)
+            loss_ri = torch.mean(((est_real - clean_real)**2).reshape(est_mag.shape[0], -1), 1) + \
+                        torch.mean(((est_imag - clean_imag)**2).reshape(est_mag.shape[0], -1), 1)
 
             est_spec_uncompress = power_uncompress(est_real, est_imag).squeeze(1)
             est_audio = torch.istft(est_spec_uncompress, self.n_fft, self.hop,
@@ -216,20 +217,26 @@ class Trainer(BaseTrainer):
 
             time_loss = torch.mean(torch.abs(est_audio - clean))
             length = est_audio.size(-1)
-            loss = self.loss_weights[0] * loss_ri + \
+        
+        est_audio_list = list(est_audio.detach().cpu().numpy())
+        clean_audio_list = list(clean.cpu().numpy()[:, :length])
+        pesq_score = discriminator.batch_pesq(clean_audio_list, est_audio_list, self.n_gpus)
+        pesq_score_weight = torch.nn.functional.softmax(1 - pesq_score)
+
+        loss_ri = (loss_ri * pesq_score_weight).sum()
+        loss_mag = (loss_mag * pesq_score_weight).sum()
+        gen_loss_GAN = (gen_loss_GAN * pesq_score_weight).sum()
+
+        loss = self.loss_weights[0] * loss_ri + \
                     self.loss_weights[1] * loss_mag + \
                     self.loss_weights[2] * time_loss + \
                     self.loss_weights[3] * gen_loss_GAN
-
+        
 
         # loss is float32 because mse_loss layers autocast to float32.
         assert loss.dtype is torch.float32, f"loss's dtype is not torch.float32 but {loss.dtype}"
 
         self.scaler.scale(loss).backward(retain_graph=True)
-
-        est_audio_list = list(est_audio.detach().cpu().numpy())
-        clean_audio_list = list(clean.cpu().numpy()[:, :length])
-        pesq_score = discriminator.batch_pesq(clean_audio_list, est_audio_list, self.n_gpus)
 
         # The calculation of PESQ can be None due to silent part
         if pesq_score is not None:
@@ -357,10 +364,11 @@ class Trainer(BaseTrainer):
         clean_mag = torch.sqrt(clean_real ** 2 + clean_imag ** 2)
 
         predict_fake_metric = self.model_discriminator(clean_mag, est_mag)
-        gen_loss_GAN = F.mse_loss(predict_fake_metric.flatten(), one_labels.float())
+        gen_loss_GAN = (predict_fake_metric.flatten() - one_labels.float())**2
 
-        loss_mag = F.mse_loss(est_mag, clean_mag)
-        loss_ri = F.mse_loss(est_real, clean_real) + F.mse_loss(est_imag, clean_imag)
+        loss_mag = torch.mean(((est_mag - clean_mag)**2).reshape(est_mag.shape[0], -1), 1)
+        loss_ri = torch.mean(((est_real - clean_real)**2).reshape(est_mag.shape[0], -1), 1) + \
+                    torch.mean(((est_imag - clean_imag)**2).reshape(est_mag.shape[0], -1), 1)
 
         est_spec_uncompress = power_uncompress(est_real, est_imag).squeeze(1)
         est_audio = torch.istft(est_spec_uncompress, self.n_fft, self.hop,
@@ -368,15 +376,20 @@ class Trainer(BaseTrainer):
 
         time_loss = torch.mean(torch.abs(est_audio - clean))
         length = est_audio.size(-1)
-        loss = self.loss_weights[0] * loss_ri + \
-                self.loss_weights[1] * loss_mag + \
-                self.loss_weights[2] * time_loss + \
-                self.loss_weights[3] * gen_loss_GAN
-
+        
         est_audio_list = list(est_audio.detach().cpu().numpy())
         clean_audio_list = list(clean.cpu().numpy()[:, :length])
-
         pesq_score = discriminator.batch_pesq(clean_audio_list, est_audio_list, self.n_gpus)
+        pesq_score_weight = torch.nn.functional.softmax(1 - pesq_score)
+
+        loss_ri = (loss_ri * pesq_score_weight).sum()
+        loss_mag = (loss_mag * pesq_score_weight).sum()
+        gen_loss_GAN = (gen_loss_GAN * pesq_score_weight).sum()
+
+        loss = self.loss_weights[0] * loss_ri + \
+                    self.loss_weights[1] * loss_mag + \
+                    self.loss_weights[2] * time_loss + \
+                    self.loss_weights[3] * gen_loss_GAN
 
         if pesq_score is not None:
             predict_enhance_metric = self.model_discriminator(clean_mag, est_mag.detach())

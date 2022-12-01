@@ -1,5 +1,5 @@
 [main]
-name = "CMGAN_sub_valentini_new_eval_dataloader_new_best_score_3"
+name = "CMGAN_valentini_sample_weight"
 seed = 42
 epochs = 127
 cut_len = 32000
@@ -37,7 +37,7 @@ ndf = 16
 
 
 [dataset_train]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/train"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/train"
     [dataset_train.dataloader]
     batchsize = 4
     n_worker = 4
@@ -48,7 +48,7 @@ path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_vale
     drop_last = true
     
 [dataset_valid]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/test"
     
     [dataset_valid.dataloader]
     batchsize = 4
@@ -59,7 +59,7 @@ path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_vale
     drop_last = false 
 
 [dataset_test]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/test"
 
 
 [optimizer]
