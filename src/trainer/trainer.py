@@ -278,13 +278,22 @@ class Trainer(BaseTrainer):
                 #gradient clipping
                 self.scaler.unscale_(self.optimizer)
                 torch.nn.utils.clip_grad_norm_(self.model.parameters(), max_norm=self.max_clip_grad_norm)
+
+                # update parameters
+                scale_before = self.scaler.get_scale()
                 self.scaler.step(self.optimizer)
                 self.optimizer.zero_grad()
-
-                self.scaler.update()
-
                 self.optimizer_disc.step()
                 self.optimizer_disc.zero_grad()
+                self.scaler.update()
+                scale_after = self.scaler.get_scale()
+                
+                is_overflown = scale_after < scale_before
+                if is_overflown:
+                    print("\n-----Skip update gradients, encounter overflow-----")
+                else:
+                    self.scheduler_G.step()
+                    self.scheduler_D.step()
                 
 
         gen_loss_train = np.mean(gen_loss_train)
@@ -333,8 +342,6 @@ class Trainer(BaseTrainer):
             self._serialize(epoch)
 
         self.dist.barrier() # see https://stackoverflow.com/questions/59760328/how-does-torch-distributed-barrier-work
-        self.scheduler_G.step()
-        self.scheduler_D.step()
 
 
     @torch.no_grad()
