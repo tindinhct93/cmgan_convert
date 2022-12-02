@@ -1,16 +1,21 @@
 [main]
-name = "CMGAN_valentini_sample_weight"
+name = "CMGAN_valentini_sample_weight_accumulation_2"
 seed = 42
 epochs = 127
 cut_len = 32000
 save_model_dir = "./save_model"
-use_amp = true # whether to use Automatic precision to speed up 
+
+# whether to use Automatic precision to speed up 
+use_amp = true 
+# whether to use ZeroRedundancyOptimizer https://pytorch.org/tutorials/recipes/zero_redundancy_optimizer.html
+use_ZeRo = false 
+
 # device_ids = "0,1,2"
 sr = 16000
 interval_eval = 5
 resume = true
 max_clip_grad_norm = 2.0 # torch.nn.utils.max_clip_grad_norm
-gradient_accumulation_steps = 1
+gradient_accumulation_steps = 2
 num_prints = 5
 
 # augmentation method
@@ -37,7 +42,7 @@ ndf = 16
 
 
 [dataset_train]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/train"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/train"
 [dataset_train.dataloader]
 batchsize = 4
 n_worker = 4
@@ -48,7 +53,7 @@ shuffle = true
 drop_last = true
     
 [dataset_valid]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/test"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
     
 [dataset_valid.dataloader]
 batchsize = 4
@@ -59,7 +64,7 @@ shuffle = false
 drop_last = false 
 
 [dataset_test]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/test"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
 
 
 [optimizer]

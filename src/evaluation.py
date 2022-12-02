@@ -95,7 +95,7 @@ def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
                                             ) for audio in audio_list)
     
     sr = 16000
-    metrics = Parallel(n_jobs=1)(
+    metrics = Parallel(n_jobs=10)(
         delayed(compute_metrics)(sf.read(os.path.join(clean_dir, audio_list[i]))[0],
                                 ls_est_audio[i][0],
                                 sr,

@@ -3,8 +3,11 @@ from models import discriminator
 import os
 from time import gmtime, strftime
 from data import dataloader
+import torch
 import torch.distributed as dist
+import torch.optim as optim
 from torch.nn.parallel import DistributedDataParallel
+from torch.distributed.optim import ZeroRedundancyOptimizer
 from utils import *
 import toml
 from torchinfo import summary
@@ -121,9 +124,24 @@ def entry(rank, world_size, config):
         summary(model_discriminator, [(1, 1, int(n_fft/2)+1, cut_len//hop+1),
                                     (1, 1, int(n_fft/2)+1, cut_len//hop+1)])
 
+    
     # optimizer
-    optimizer = torch.optim.AdamW(model.parameters(), lr=init_lr)
-    optimizer_disc = torch.optim.AdamW(model_discriminator.parameters(), lr=2*init_lr)
+    if config['main']['use_ZeRo']:
+        optimizer = ZeroRedundancyOptimizer( 
+            model.parameters(),
+            optimizer_class=torch.optim.AdamW,
+            lr=init_lr
+        )
+        optimizer_disc = ZeroRedundancyOptimizer(
+            model_discriminator.parameters(),
+            optimizer_class=torch.optim.AdamW,
+            lr=2*init_lr
+        )
+    else:
+        optimizer = torch.optim.AdamW(model.parameters(), 
+                                    lr=init_lr)
+        optimizer_disc = torch.optim.AdamW(model_discriminator.parameters(), 
+                                    lr=2*init_lr)
 
     # scheduler
     scheduler_G = torch.optim.lr_scheduler.StepLR(optimizer, step_size=decay_epoch, gamma=gamma)
