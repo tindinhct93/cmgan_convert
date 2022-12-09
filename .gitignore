@@ -2,3 +2,6 @@ src/runs
 src/n_fft-400,hop-100
 src/save_model
 src/saved_tracks_best
+
+*.out
+*.pyc
