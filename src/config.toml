@@ -1,7 +1,7 @@
 [main]
-name = "CMGAN_valentini_sample_weight_accumulation_2"
+name = "CMGAN_g7_14h_groupPosAttn=3"
 seed = 42
-epochs = 127
+epochs = 150
 cut_len = 32000
 save_model_dir = "./save_model"
 
@@ -15,12 +15,12 @@ sr = 16000
 interval_eval = 5
 resume = true
 max_clip_grad_norm = 2.0 # torch.nn.utils.max_clip_grad_norm
-gradient_accumulation_steps = 2
+gradient_accumulation_steps = 1
 num_prints = 5
 
 # augmentation method
 [main.augment]
-remix = true
+remix = false
 
 # You can experiment on different weights for final loss combination
 [main.loss_weights]
@@ -42,9 +42,9 @@ ndf = 16
 
 
 [dataset_train]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/train"
+path = "/data1/speech/khanhnnm/database/denoiser_db/cmgan_data_format/g7_14h/train"
 [dataset_train.dataloader]
-batchsize = 4
+batchsize = 7
 n_worker = 4
 pin_memory = true
 
@@ -53,7 +53,7 @@ shuffle = true
 drop_last = true
     
 [dataset_valid]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/test"
     
 [dataset_valid.dataloader]
 batchsize = 4
@@ -64,7 +64,7 @@ shuffle = false
 drop_last = false 
 
 [dataset_test]
-path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/sub_test_valentini/test"
+path = "/data1/speech/khanhnnm/database/denoiser_db/valentini_2017/test"
 
 
 [optimizer]
@@ -76,8 +76,3 @@ gamma = 0.5
 
 [trainer]
 path = "trainer.trainer.Trainer"
-
-
-    
-    
-
