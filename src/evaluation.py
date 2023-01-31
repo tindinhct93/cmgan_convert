@@ -60,7 +60,7 @@ def enhance_one_track(model, audio_path, saved_dir, cut_len, n_fft=400, hop=100,
         sf.write(saved_path, est_audio, sr)
 
     RTF = (time_end - time_start) / (length / sr)
-    return est_audio, length
+    return est_audio, length,RTF
 
 
 def evaluation(model_path, noisy_dir, clean_dir, save_tracks, saved_dir):
